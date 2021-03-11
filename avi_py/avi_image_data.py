@@ -44,7 +44,7 @@ class AviImageData:
         self._tile_size = tile_size
 
     @property
-    def icc_profile(self) -> Union[None, str]:
+    def icc_profile(self) -> Union[None, bytes]:
         return self._icc_profile
 
     @icc_profile.setter
@@ -87,6 +87,9 @@ class AviImageData:
     @compression_numerator.setter
     def compression_numerator(self, compression_numerator: int) -> None:
         self._compression_numerator = compression_numerator
+
+    def image_ext(self) -> str:
+        return self.image_src_path.suffix
 
     def jp2_space(self) -> str:
         return 'sRGB' if self.src_quality == 'color' else 'sLUM'

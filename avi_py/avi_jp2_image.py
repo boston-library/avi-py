@@ -3,6 +3,8 @@ import shutil
 import os
 import logging
 import errno
+import subprocess
+import sys
 
 from .constants import *
 from .avi_image_data import AviImageData
@@ -20,52 +22,49 @@ class AviJp2Image:
         self.converter = conversion.Converter(exiftool_path=EXIFTOOL_PATH)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
+        self.logger.addHandler(logging.StreamHandler(sys.stdout))
 
     def convert_to_jp2(self) -> str:
         kdu_args = self.__calculate_kdu_options() + self.__calculate_kdu_recipe()
         input_file = str(self.image_data.image_src_path)
         jp2_out_file = f'{DERIVATIVES_OUT_FOLDER}/{self.__get_out_filename(ext="jp2")}'
 
-        if self.image_data.needs_icc_profile():
-            self.logger.info(f'Adding icc profile to image')
+        if self.image_data.src_quality == 'color':
+            self.logger.debug(f'Adding icc profile to image')
             input_file = self.convert_icc_profile()
-            self.logger.info(f'successfully added icc profile')
+            self.logger.debug(f'Successfully added icc profile')
 
-        self.logger.info(f'pre validating image at {input_file}')
+        self.logger.debug(f'Pre validating image at {input_file}')
 
         validation.check_image_suitable_for_jp2_conversion(
             input_file, require_icc_profile_for_colour=True,
             require_icc_profile_for_greyscale=False)
 
-        self.logger.info(f'image {input_file} is able to be converted to jp2!')
+        self.logger.debug(f'image {input_file} is able to be converted to jp2!')
 
         with Image.open(input_file) as input_pil:
-            if tiff_pil.mode == 'RGBA':
+            if input_pil.mode == 'RGBA':
                 if kakadu.ALPHA_OPTION not in kdu_args:
                     kdu_args += [kakadu.ALPHA_OPTION]
 
-        self.logger.info(f'Kakadu args are {kdu_args}')
-        self.logger.info(f'Preparing to output jp2...')
+        self.logger.debug(f'Kakadu args are {kdu_args}')
+        self.logger.debug(f'Preparing to output jp2...')
 
         self.kakadu.kdu_compress(input_file, jp2_out_file, kakadu_options=kdu_args)
-        self.logger.info("success!")
+        self.logger.debug('successfully converted to jp2!')
         return jp2_out_file
 
     def convert_icc_profile(self) -> str:
-        if not self.image_data.needs_icc_profile():
-            return str(self.image_data.image_src_path)
-
-        out_file = f'{DERIVATIVES_OUT_FOLDER}/{self.__get_out_filename(ext="tiff", prefix="icc_converted_")}'
-        with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix='.tiff') as temp_tiff_file_obj:
+        out_file = f'{DERIVATIVES_OUT_FOLDER}/{self.__get_out_filename(ext=self.image_data.image_ext(), prefix="icc_converted_")}'
+        with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix=self.image_data.image_ext()) as temp_tiff_file_obj:
             temp_tiff_filepath = temp_tiff_file_obj.name
-            print(temp_tiff_filepath)
             shutil.copy(str(self.image_data.image_src_path), temp_tiff_filepath)
-            profile_image = Image.open(temp_tiff_filepath)
-            profile = ImageCms.createProfile(self.image_data.jp2_space())
-            profile_image.save(temp_tiff_filepath, icc_profile=profile)
-            with Image.open(temp_tiff_filepath) as new_img:
-                print(new_img.info.get('icc_profile'))
-            self.converter.convert_icc_profile(temp_tiff_filepath, out_file, ICC_PROFILE_PATH)
+            # if self.image_data.needs_icc_profile():
+                #Going to have to call image magick in this case
+                # with Image.open(temp_tiff_filepath) as tif_pil:
+                #     tif_pil.convert('RGB')
+                #     tif_pil.save(temp_tiff_filepath, compression='tiff_adobe_deflate')
+            self.converter.convert_icc_profile(temp_tiff_filepath, out_file, ICC_PROFILE_PATH, new_colour_mode='RGB')
         return out_file
 
     def __calculate_kdu_recipe(self) -> list:
