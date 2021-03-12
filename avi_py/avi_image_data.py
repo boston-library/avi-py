@@ -2,7 +2,7 @@ import os
 import shutil
 import errno
 
-from .constants import *
+from avi_py import constants as avi_const
 
 from pathlib import Path
 from typing import Union
@@ -11,9 +11,9 @@ from PIL import Image
 
 class AviImageData:
     def __init__(self, image_src_path: Union[str, Path],
-                tile_size: int=KDU_DEFAULT_TILE_SIZE,
-                layer_count: int=KDU_DEFAULT_LAYER_COUNT,
-                compression_numerator: int=IMAGE_DEFAULT_COMPRESSION) -> None:
+                tile_size: int=avi_const.KDU_DEFAULT_TILE_SIZE,
+                layer_count: int=avi_const.KDU_DEFAULT_LAYER_COUNT,
+                compression_numerator: int=avi_const.IMAGE_DEFAULT_COMPRESSION) -> None:
         self.image_src_path = image_src_path
         self.tile_size = tile_size
         self.layer_count = layer_count
@@ -57,7 +57,7 @@ class AviImageData:
 
     @src_quality.setter
     def src_quality(self, img: Image) -> None:
-        if img.mode in COLOR_MODES:
+        if img.mode in avi_const.COLOR_MODES:
             self._src_quality = 'color'
         elif img.mode == validation.GREYSCALE:
             self._src_quality = 'gray'
@@ -100,7 +100,7 @@ class AviImageData:
     def level_count_for_size(self) -> int:
         levels = 0
         level_size = self.long_dim
-        while (level_size >= IMAGE_MAX_LEVEL_SIZE):
+        while (level_size >= avi_const.IMAGE_MAX_LEVEL_SIZE):
             level_size = level_size / 2
             levels = levels + 1
         return levels - 1
