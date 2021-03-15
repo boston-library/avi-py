@@ -9,6 +9,7 @@ except ImportError:
 
 KAKADU_BASE_PATH=os.getenv('KAKADU_HOME_PATH')
 AVI_FILES_DIR=os.getenv('AVI_FILES_DIR', f'{os.getenv("HOME")}/avi-files')
+DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
 DERIVATIVES_OUT_FOLDER=f'{AVI_FILES_DIR}/derivatives-out'
 DERIVATIVES_SRC_FOLDER=f'{AVI_FILES_DIR}/src-files'
 PROJECT_ROOT=Path(__file__).parent.parent
@@ -27,6 +28,8 @@ KAKADU_DEFAULT_OPTIONS=[
     '-flush_period', '1024',
     '-no_weights'
 ]
+if not DEBUG_MODE:
+    KAKADU_DEFAULT_OPTIONS += ['-quiet']
 
 KAKADU_DEFAULT_RECIPE=[
     'Cblk={64,64}',
