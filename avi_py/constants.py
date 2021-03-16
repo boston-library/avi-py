@@ -16,6 +16,8 @@ PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
 EXIFTOOL_PATH='exiftool'
 COLOR_MODES=['RGB', 'RGBA']
+VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
+
 
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024

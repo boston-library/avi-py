@@ -91,6 +91,9 @@ class AviImageData:
     def image_ext(self) -> str:
         return self.image_src_path.suffix
 
+    def valid_image_ext(self) -> bool:
+        return self.image_ext() in avi_const.VALID_IMAGE_EXTENSIONS
+
     def jp2_space(self) -> str:
         return 'sRGB' if self.src_quality == 'color' else 'sLUM'
 
