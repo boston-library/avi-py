@@ -1,5 +1,6 @@
 import logging
 import pytest
+import sys
 
 from pathlib import Path
 from avi_py.avi_jp2_image import AviJp2Image

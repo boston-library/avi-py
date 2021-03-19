@@ -1,13 +1,12 @@
 import os
-import shutil
 import errno
+from pathlib import Path
+from typing import Union
+from PIL import Image
+from image_processing import validation
 
 from avi_py import constants as avi_const
 
-from pathlib import Path
-from typing import Union
-from image_processing import validation
-from PIL import Image
 
 class AviImageData:
     def __init__(self, image_src_path: Union[str, Path],
@@ -31,8 +30,9 @@ class AviImageData:
     def image_src_path(self, image_src_path: Union[str, Path]) -> None:
         if not isinstance(image_src_path, Path):
             image_src_path = Path(image_src_path)
-        if not image_src_path.exists():
-            raise IOError(f'no path found at {str(image_src_path)}')
+        if not image_src_path.is_file():
+            raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), str(image_src_path))
         self._image_src_path = image_src_path
 
     @property
@@ -98,12 +98,12 @@ class AviImageData:
         return 'sRGB' if self.src_quality == 'color' else 'sLUM'
 
     def needs_icc_profile(self) -> bool:
-        return self.src_quality == 'color' and self.icc_profile == None
+        return self.src_quality == 'color' and self.icc_profile is None
 
     def level_count_for_size(self) -> int:
         levels = 0
         level_size = self.long_dim
-        while (level_size >= avi_const.IMAGE_MAX_LEVEL_SIZE):
+        while level_size >= avi_const.IMAGE_MAX_LEVEL_SIZE:
             level_size = level_size / 2
             levels = levels + 1
         return levels - 1

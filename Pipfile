@@ -11,6 +11,8 @@ pillow = ">5"
 [dev-packages]
 python-dotenv = ">=0.15"
 pytest = ">=6.2"
+pylint = "~=2.7"
+coveralls = "~=3.0"
 
 [requires]
 python_version = "3.8"

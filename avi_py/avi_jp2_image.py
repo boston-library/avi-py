@@ -6,16 +6,17 @@ import errno
 import subprocess
 import sys
 import json
+from pathlib import Path
+from typing import Union
+from image_processing.exceptions import KakaduError, ValidationError, ImageProcessingError
+from image_processing import validation, kakadu, conversion
+from image_processing.kakadu import Kakadu
+from PIL import Image
+from PIL.ImageCms import PyCMSError
 
 from avi_py import constants as avi_const
 from avi_py.avi_image_data import AviImageData
 
-from pathlib import Path
-from image_processing.exceptions import KakaduError, ValidationError, ImageProcessingError
-from image_processing import validation, kakadu, conversion
-from image_processing.kakadu import Kakadu
-from PIL import Image, ImageCms
-from PIL.ImageCms import PyCMSError
 
 class AviJp2ImageError(Exception):
     def __init__(self, message):
@@ -23,17 +24,18 @@ class AviJp2ImageError(Exception):
 
 
 class AviJp2Image:
-    def __init__(self, input_file_path: str) -> None:
+    def __init__(self, input_file_path: Union[str, Path],
+                output_dir: Union[str, Path]=avi_const.DERIVATIVES_OUT_FOLDER,
+                console_debug: bool=avi_const.CONSOLE_DEBUG_MODE) -> None:
         self.image_data = AviImageData(input_file_path)
         self.kakadu = Kakadu(kakadu_base_path=avi_const.KAKADU_BASE_PATH)
         self.converter = conversion.Converter(exiftool_path=avi_const.EXIFTOOL_PATH)
+        self.output_dir = output_dir
         self.result = {}
         self.logger = logging.getLogger(__name__)
-        if avi_const.DEBUG_MODE:
+        if console_debug:
             self.logger.setLevel(logging.DEBUG)
             self.logger.addHandler(logging.StreamHandler(sys.stdout))
-        else:
-            self.logger.setLevel(logging.INFO)
 
     @property
     def result(self) -> dict:
@@ -43,22 +45,30 @@ class AviJp2Image:
     def result(self, res: dict={}) -> None:
         self._result = res
 
+    @property
+    def output_dir(self) -> str:
+        return self._output_dir
+
+    @output_dir.setter
+    def output_directory(self, out_dir: Union[str, Path]) -> None:
+        self._output_dir = str(out_dir)
+
     def json_result(self) -> str:
         return json.dumps(self.result)
 
     def convert_to_jp2(self) -> None:
         try:
             if not self.image_data.valid_image_ext():
-                raise AviJp2ImageError(f'Source image is not a .tiff or .tif')
+                raise AviJp2ImageError('Source image is not a .tiff or .tif')
 
             kdu_args = self.__calculate_kdu_options() + self.__calculate_kdu_recipe()
             input_file = str(self.image_data.image_src_path)
-            jp2_out_file = f'{avi_const.DERIVATIVES_OUT_FOLDER}/{self.__get_out_filename(ext=".jp2")}'
+            jp2_out_file = f'{self.output_dir}/{self.__get_out_filename(ext=".jp2")}'
 
             if self.image_data.src_quality == 'color':
-                self.logger.debug(f'Adding icc profile to image')
+                self.logger.debug('Adding icc profile to image')
                 input_file = self.convert_icc_profile()
-                self.logger.debug(f'Successfully added icc profile')
+                self.logger.debug('Successfully added icc profile')
 
             self.logger.debug(f'Pre validating image at {input_file}')
 
@@ -66,8 +76,8 @@ class AviJp2Image:
                 validation.check_image_suitable_for_jp2_conversion(
                     input_file, require_icc_profile_for_colour=True,
                     require_icc_profile_for_greyscale=False)
-            except ValidationError as ve:
-                msg = f'ValidationError: {ve}'
+            except ValidationError as v_e:
+                msg = f'ValidationError: {v_e}'
                 self.__set_error_result(msg)
                 raise AviJp2ImageError(msg)
 
@@ -79,22 +89,22 @@ class AviJp2Image:
                         kdu_args += [kakadu.ALPHA_OPTION]
 
             self.logger.debug(f'Kakadu args are {kdu_args}')
-            self.logger.debug(f'Preparing to output jp2...')
+            self.logger.debug('Preparing to output jp2...')
 
             try:
                 self.kakadu.kdu_compress(input_file, jp2_out_file, kakadu_options=kdu_args)
-            except KakaduError, OSError as kdue:
-                msg = f'KakaduError {kdue}'
+            except (KakaduError, OSError) as kdu_e:
+                msg = f'{kdu_e.__class__.__name__} {kdu_e}'
                 self.__set_error_result(msg)
                 raise AviJp2ImageError(msg)
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result(jp2_out_file)
-        except AviJp2Image as avie:
+        except AviJp2ImageError:
             self.logger.error('Error Occured processing file check result to see details')
 
     def convert_icc_profile(self) -> str:
         try:
-            out_file = f'{avi_const.DERIVATIVES_OUT_FOLDER}/{self.__get_out_filename(ext=self.image_data.image_ext(), prefix="icc_converted_")}'
+            out_file = f'{self.output_dir}/{self.__get_out_filename(ext=self.image_data.image_ext(), prefix="icc_converted_")}'
             with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix=self.image_data.image_ext()) as temp_tiff_file_obj:
                 temp_tiff_filepath = temp_tiff_file_obj.name
                 shutil.copy(str(self.image_data.image_src_path), temp_tiff_filepath)
@@ -104,8 +114,8 @@ class AviJp2Image:
                     self.logger.debug('Adding icc profile with pillow..')
                     self.converter.convert_icc_profile(temp_tiff_filepath, out_file, str(avi_const.ICC_PROFILE_PATH))
             return out_file
-        except AssertionError, PyCMSError, ImageProcessingError, IOError as ae:
-            msg = f'{ae.__class__.__name__}{ae}'
+        except (AssertionError, PyCMSError, ImageProcessingError, IOError) as a_e:
+            msg = f'{a_e.__class__.__name__}{a_e}'
             self.__set_error_result(msg)
             raise AviJp2ImageError(msg)
 
@@ -123,8 +133,8 @@ class AviJp2Image:
         self.logger.debug(magick_commands)
         try:
             subprocess.call(magick_commands)
-        except subprocess.CalledProcessError as spe:
-            msg = f'ICC Magick Convert Failed!\n Reason: {spe}'
+        except subprocess.CalledProcessError as sp_e:
+            msg = f'ICC Magick Convert Failed!\n Reason: {sp_e}'
             raise IOError(msg)
 
     def __calculate_kdu_recipe(self) -> list:

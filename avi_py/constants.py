@@ -9,8 +9,9 @@ except ImportError:
 
 KAKADU_BASE_PATH=os.getenv('KAKADU_HOME_PATH')
 AVI_FILES_DIR=os.getenv('AVI_FILES_DIR', f'{os.getenv("HOME")}/avi-files')
-DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
+CONSOLE_DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
 DERIVATIVES_OUT_FOLDER=f'{AVI_FILES_DIR}/derivatives-out'
+# NOTE: May not need the source folder path below. But definetley in the avi processor
 DERIVATIVES_SRC_FOLDER=f'{AVI_FILES_DIR}/src-files'
 PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
@@ -30,7 +31,7 @@ KAKADU_DEFAULT_OPTIONS=[
     '-flush_period', '1024',
     '-no_weights'
 ]
-if not DEBUG_MODE:
+if not CONSOLE_DEBUG_MODE:
     KAKADU_DEFAULT_OPTIONS += ['-quiet']
 
 KAKADU_DEFAULT_RECIPE=[
