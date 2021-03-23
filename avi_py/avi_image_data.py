@@ -7,8 +7,11 @@ from image_processing import validation
 
 from avi_py import constants as avi_const
 
-
 class AviImageData:
+    """
+    Class for storing all low level image data for functions that are used to populate
+    Additional Kakau options
+    """
     def __init__(self, image_src_path: Union[str, Path],
                 tile_size: int=avi_const.KDU_DEFAULT_TILE_SIZE,
                 layer_count: int=avi_const.KDU_DEFAULT_LAYER_COUNT,

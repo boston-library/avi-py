@@ -1,6 +1,5 @@
 import logging
 import pytest
-import tempfile
 import os
 import sys
 from pathlib import Path
@@ -57,6 +56,14 @@ class TestAviImageData:
         assert isinstance(grayscaled_image_data.needs_icc_profile(), bool)
         assert grayscaled_image_data.needs_icc_profile() == False
 
+        assert isinstance(grayscaled_image_data.long_dim, int)
+        assert isinstance(grayscaled_image_data.level_count_for_size(), int)
+        assert isinstance(grayscaled_image_data.layer_rates(), str)
+
+        with file_fixtures.image_fixture(grayscaled_image_data.image_src_path) as gsi:
+            assert grayscaled_image_data.long_dim == max(gsi.width, gsi.height)
+            assert grayscaled_image_data.icc_profile == gsi.info.get('icc_profile')
+
     def test_srgb_image_data(self, srgb_image_data):
         assert isinstance(srgb_image_data, AviImageData)
 
@@ -87,6 +94,14 @@ class TestAviImageData:
         assert isinstance(srgb_image_data.needs_icc_profile(), bool)
         assert srgb_image_data.needs_icc_profile() == False
 
+        assert isinstance(srgb_image_data.long_dim, int)
+        assert isinstance(srgb_image_data.level_count_for_size(), int)
+        assert isinstance(srgb_image_data.layer_rates(), str)
+
+        with file_fixtures.image_fixture(srgb_image_data.image_src_path) as srgbi:
+            assert srgb_image_data.long_dim == max(srgbi.width, srgbi.height)
+            assert srgb_image_data.icc_profile == srgbi.info.get('icc_profile')
+
     def test_no_icc_image_data(self, no_icc_profile_image):
         assert isinstance(no_icc_profile_image, AviImageData)
 
@@ -116,3 +131,11 @@ class TestAviImageData:
 
         assert isinstance(no_icc_profile_image.needs_icc_profile(), bool)
         assert no_icc_profile_image.needs_icc_profile() == True
+
+        assert isinstance(no_icc_profile_image.long_dim, int)
+        assert isinstance(no_icc_profile_image.level_count_for_size(), int)
+        assert isinstance(no_icc_profile_image.layer_rates(), str)
+
+        with file_fixtures.image_fixture(no_icc_profile_image.image_src_path) as no_icc_i:
+            assert no_icc_profile_image.long_dim == max(no_icc_i.width, no_icc_i.height)
+            assert no_icc_profile_image.icc_profile == no_icc_i.info.get('icc_profile')

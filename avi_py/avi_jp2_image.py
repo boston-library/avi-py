@@ -1,8 +1,6 @@
 import tempfile
 import shutil
-import os
 import logging
-import errno
 import subprocess
 import sys
 import json
@@ -19,9 +17,7 @@ from avi_py.avi_image_data import AviImageData
 
 
 class AviJp2ImageError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
+    pass
 
 class AviJp2Image:
     def __init__(self, input_file_path: Union[str, Path],
@@ -42,7 +38,7 @@ class AviJp2Image:
         return self._result
 
     @result.setter
-    def result(self, res: dict={}) -> None:
+    def result(self, res: dict) -> None:
         self._result = res
 
     @property
@@ -50,7 +46,7 @@ class AviJp2Image:
         return self._output_dir
 
     @output_dir.setter
-    def output_directory(self, out_dir: Union[str, Path]) -> None:
+    def output_dir(self, out_dir: Union[str, Path]) -> None:
         self._output_dir = str(out_dir)
 
     def json_result(self) -> str:
@@ -70,7 +66,7 @@ class AviJp2Image:
                 input_file = self.convert_icc_profile()
                 self.logger.debug('Successfully added icc profile')
 
-            self.logger.debug(f'Pre validating image at {input_file}')
+            self.logger.debug('Pre validating image at {}'.format(input_file))
 
             try:
                 validation.check_image_suitable_for_jp2_conversion(
@@ -81,14 +77,14 @@ class AviJp2Image:
                 self.__set_error_result(msg)
                 raise AviJp2ImageError(msg)
 
-            self.logger.debug(f'image {input_file} is able to be converted to jp2!')
+            self.logger.debug('image {} is able to be converted to jp2!'.format(input_file))
 
             with Image.open(input_file) as input_pil:
                 if input_pil.mode == 'RGBA':
                     if kakadu.ALPHA_OPTION not in kdu_args:
                         kdu_args += [kakadu.ALPHA_OPTION]
 
-            self.logger.debug(f'Kakadu args are {kdu_args}')
+            self.logger.debug('Kakadu args are {}'.format(kdu_args))
             self.logger.debug('Preparing to output jp2...')
 
             try:
@@ -125,6 +121,7 @@ class AviJp2Image:
         icc_profile_path = str(avi_const.ICC_PROFILE_PATH)
         magick_commands = [
             'convert',
+            '-quiet',
             input_file,
             '-profile', icc_profile_path,
             out_file

@@ -230,7 +230,7 @@ indent-after-paren=4
 indent-string='    '
 
 # Maximum number of characters on a single line.
-max-line-length=100
+max-line-length=200
 
 # Maximum number of lines in a module.
 max-module-lines=1000
@@ -556,7 +556,7 @@ valid-metaclass-classmethod-first-arg=cls
 max-args=5
 
 # Maximum number of attributes for a class (see R0902).
-max-attributes=7
+max-attributes=15
 
 # Maximum number of boolean expressions in an if statement (see R0916).
 max-bool-expr=5
