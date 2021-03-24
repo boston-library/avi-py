@@ -19,3 +19,4 @@ __pycache__
 .vim
 site
 scratch.py
+.python-version
