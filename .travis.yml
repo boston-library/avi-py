@@ -23,9 +23,9 @@ env:
     - KAKADU_HOME_PATH=/opt/kakadu
     - AVI_FILES_DIR="${HOME}/avi-files"
     - AVI_DEBUG=true
+    - MAGICK_MEMORY_LIMIT=512
 
 install:
-  - echo "$(convert -version)"
   - echo "$(convert -list resource)"
   - wget http://kakadusoftware.com/wp-content/uploads/KDU805_Demo_Apps_for_Linux-x86-64_200602.zip
   - unzip KDU805_Demo_Apps_for_Linux-x86-64_200602.zip
