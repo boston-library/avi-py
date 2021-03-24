@@ -15,7 +15,9 @@ addons:
       - unzip
       - exiftool
       - libstdc++6
+      - libtiff-dev
       - imagemagick
+
 env:
   global:
     - KAKADU_HOME_PATH=/opt/kakadu
@@ -23,6 +25,8 @@ env:
     - AVI_DEBUG=true
 
 install:
+  - echo "$(convert -version)"
+  - echo "$(convert -list resource)"
   - wget http://kakadusoftware.com/wp-content/uploads/KDU805_Demo_Apps_for_Linux-x86-64_200602.zip
   - unzip KDU805_Demo_Apps_for_Linux-x86-64_200602.zip
   - mv KDU805_Demo_Apps_for_Linux-x86-64_200602 $KAKADU_HOME_PATH
@@ -33,7 +37,7 @@ install:
   - pip install pipenv --upgrade-strategy=only-if-needed
   - pipenv install --dev
 script:
-  - pipenv run pylint avi_py/ && pipenv run pytest --cov=avi_py/
+  - pylint avi_py/ && pytest --cov=avi_py/
 
 after_success:
-  - pipenv run coveralls
+  - coveralls
