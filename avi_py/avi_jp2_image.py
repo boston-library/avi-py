@@ -15,11 +15,16 @@ from PIL.ImageCms import PyCMSError
 from avi_py import constants as avi_const
 from avi_py.avi_image_data import AviImageData
 
-
+#pylint: disable=missing-class-docstring
 class AviJp2ImageError(Exception):
     pass
 
+#pylint: enable=missing-class-docstring
+
 class AviJp2Image:
+    """
+    Class that checks and converts a source tiff image to a jp2 derivative
+    """
     def __init__(self, input_file_path: Union[str, Path],
                 output_dir: Union[str, Path]=avi_const.DERIVATIVES_OUT_FOLDER,
                 console_debug: bool=avi_const.CONSOLE_DEBUG_MODE) -> None:
@@ -75,7 +80,7 @@ class AviJp2Image:
             except ValidationError as v_e:
                 msg = f'ValidationError: {v_e}'
                 self.__set_error_result(msg)
-                raise AviJp2ImageError(msg)
+                raise AviJp2ImageError(msg) from v_e
 
             self.logger.debug('image {} is able to be converted to jp2!'.format(input_file))
 
@@ -92,7 +97,7 @@ class AviJp2Image:
             except (KakaduError, OSError) as kdu_e:
                 msg = f'{kdu_e.__class__.__name__} {kdu_e}'
                 self.__set_error_result(msg)
-                raise AviJp2ImageError(msg)
+                raise AviJp2ImageError(msg) from kdu_e
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result(jp2_out_file)
         except AviJp2ImageError:
@@ -113,7 +118,7 @@ class AviJp2Image:
         except (AssertionError, PyCMSError, ImageProcessingError, IOError) as a_e:
             msg = f'{a_e.__class__.__name__}{a_e}'
             self.__set_error_result(msg)
-            raise AviJp2ImageError(msg)
+            raise AviJp2ImageError(msg) from a_e
 
     def __convert_icc_profile_with_magick(self, input_file: str, out_file: str) -> None:
         assert shutil.which('convert') is not None, 'imagemagick not installed on this system!'
@@ -132,7 +137,7 @@ class AviJp2Image:
             subprocess.call(magick_commands)
         except subprocess.CalledProcessError as sp_e:
             msg = f'ICC Magick Convert Failed!\n Reason: {sp_e}'
-            raise IOError(msg)
+            raise IOError(msg) from sp_e
 
     def __calculate_kdu_recipe(self) -> list:
         return [
