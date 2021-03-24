@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "2446b6a0af8501fbbfcc1bbfae886a05ce551d341b0d2de3192dca2d02186a28"
+            "sha256": "3e366329684169bd1593e8b970f847610caac83585ebf840af20f086b136f91e"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,10 @@
         ]
     },
     "default": {
+        "avi-py": {
+            "editable": true,
+            "path": "."
+        },
         "image-processing": {
             "editable": true,
             "git": "https://github.com/bodleian/image-processing.git",

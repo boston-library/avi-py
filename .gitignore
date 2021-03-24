@@ -2,6 +2,7 @@
 # Compiled python modules.
 *.pyc
 __pycache__
+*.toml
 
 # Setuptools distribution folder.
 /dist/
