@@ -52,6 +52,7 @@ class AviJp2Image:
 
     @output_dir.setter
     def output_dir(self, out_dir: Union[str, Path]) -> None:
+        Path(str(out_dir)).mkdir(parents=True, exist_ok=True)
         self._output_dir = str(out_dir)
 
     def json_result(self) -> str:
