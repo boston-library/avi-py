@@ -28,4 +28,4 @@ def avi_convert_jp2():
     if avi_jp2_convert.result.get('success') is False:
         sys.exit(avi_jp2_convert.json_result())
 
-    print(avi_jp2_convert.json_result(), file=sys.stdout)
+    print(avi_jp2_convert.json_result(), flush=True)
