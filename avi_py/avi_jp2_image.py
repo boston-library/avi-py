@@ -127,6 +127,8 @@ class AviJp2Image:
         magick_commands = [
             'convert',
             '-quiet',
+            '-compress',
+            'none',
             input_file,
             '-profile', icc_profile_path,
             out_file

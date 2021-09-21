@@ -93,7 +93,9 @@ setup(
     #
     #   py_modules=["my_module"],
     #
-    packages=find_packages(exclude=["contrib", "docs", "tests","color_profiles"]),  # Required
+    packages=find_packages(
+        exclude=["contrib", "docs", "tests", "color_profiles"]
+    ),  # Required
     # Specify which Python versions you support. In contrast to the
     # 'Programming Language' classifiers above, 'pip install' will check this
     # and refuse to install the project if the version does not match. If you
@@ -107,11 +109,42 @@ setup(
     # For an analysis of "install_requires" vs pip's requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        "appdirs==1.4.4",
+        "attrs==21.2.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+        "black==19.10b0; python_version >= '3.6'",
+        "cached-property==1.5.2",
+        "cerberus==1.3.4",
+        "certifi==2021.5.30",
+        "charset-normalizer==2.0.6; python_version >= '3'",
+        "click==8.0.1; python_version >= '3.6'",
+        "colorama==0.4.4; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+        "distlib==0.3.2",
+        "idna==3.2; python_version >= '3'",
         "jpylyzer==2.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3' and python_version < '4'",
         "numpy==1.20.1; python_version >= '3.7'",
         "opencv-python==4.5.1.48",
-        "pillow==8.1.2",
+        "orderedmultidict==1.0.1",
+        "packaging==20.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "pathspec==0.9.0",
+        "pep517==0.11.0",
+        "pillow==8.3.2",
+        "pip-shims==0.5.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+        "pipenv-setup==3.1.1",
+        "pipfile==0.0.2",
+        "plette[validation]==0.2.3; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "pyparsing==2.4.7; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "python-dateutil==2.8.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "regex==2021.8.28",
+        "requests==2.26.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4, 3.5'",
+        "requirementslib==1.5.16; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
         "six==1.15.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "toml==0.10.2; python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "tomli==1.2.1; python_version >= '3.6'",
+        "tomlkit==0.7.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+        "typed-ast==1.4.3",
+        "urllib3==1.26.6",
+        "vistir==0.5.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+        "wheel==0.37.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development
     # dependencies). Users will be able to install these using the "extras"
