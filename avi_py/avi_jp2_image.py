@@ -1,13 +1,18 @@
+from __future__ import absolute_import
+from __future__ import print_function
+
 import tempfile
 import shutil
 import logging
 import subprocess
 import sys
 import json
+import os
 from pathlib import Path
 from typing import Union
 from image_processing.exceptions import KakaduError, ValidationError, ImageProcessingError
-from image_processing import validation, kakadu, conversion
+from image_processing import validation, kakadu
+from image_processing.conversion import Converter
 from image_processing.kakadu import Kakadu
 from PIL import Image
 from PIL.ImageCms import PyCMSError
@@ -21,6 +26,42 @@ class AviJp2ImageError(Exception):
 
 #pylint: enable=missing-class-docstring
 
+class AviConverter(Converter):
+    """
+    Overloaded class for coversion that allows exiftool to be run in quiet mode
+    """
+    def __init__(self, exiftool_path='exiftool', quiet=False):
+        super().__init__(exiftool_path)
+        self.quiet = quiet
+#pylint: disable=raise-missing-from
+    def copy_over_embedded_metadata(self, input_image_filepath, output_image_filepath, write_only_xmp=False):
+        """
+        Copy embedded image metadata from the input_image_filepath to the output_image_filepath
+        :param input_image_filepath: input filepath
+        :param output_image_filepath: output filepath
+        :param write_only_xmp: Copy all information to the same-named tags in XMP (if they exist). With JP2 it's safest to only use xmp tags, as other ones may not be supported by all software
+        """
+        if not os.access(input_image_filepath, os.R_OK):
+            raise IOError("Could not read input image path {0}".format(input_image_filepath))
+        if not os.access(output_image_filepath, os.W_OK):
+            raise IOError("Could not write to output path {0}".format(output_image_filepath))
+
+        command_options = [self.exiftool_path]
+        if self.quiet:
+            command_options += ['-q']
+        command_options += ['-tagsFromFile', input_image_filepath, '-overwrite_original']
+        if write_only_xmp:
+            command_options += ['-xmp:all<all']
+        command_options += [output_image_filepath]
+        self.logger.debug(' '.join(command_options))
+        try:
+            subprocess.check_call(command_options, stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as error:
+            raise ImageProcessingError('Exiftool at {0} failed to copy from {1}. Command: {2}, Error: {3}'.
+                                       format(self.exiftool_path, input_image_filepath, ' '.join(command_options), error))
+#pylint: enable=raise-missing-from
+
+
 class AviJp2Image:
     """
     Class that checks and converts a source tiff image to a jp2 derivative
@@ -30,7 +71,7 @@ class AviJp2Image:
                 console_debug: bool=avi_const.CONSOLE_DEBUG_MODE) -> None:
         self.image_data = AviImageData(input_file_path)
         self.kakadu = Kakadu(kakadu_base_path=avi_const.KAKADU_BASE_PATH)
-        self.converter = conversion.Converter(exiftool_path=avi_const.EXIFTOOL_PATH)
+        self.converter = AviConverter(exiftool_path=avi_const.EXIFTOOL_PATH, quiet=not console_debug)
         self.output_dir = output_dir
         self.result = {}
         self.logger = logging.getLogger(__name__)
@@ -73,7 +114,6 @@ class AviJp2Image:
                 self.logger.debug('Successfully added icc profile')
 
             self.logger.debug('Pre validating image at {}'.format(input_file))
-
             try:
                 validation.check_image_suitable_for_jp2_conversion(
                     input_file, require_icc_profile_for_colour=True,

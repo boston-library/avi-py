@@ -1,7 +1,9 @@
+from __future__ import print_function
+from __future__ import absolute_import
+
 import argparse
 import sys
 import logging
-
 from avi_py.avi_jp2_image import AviJp2Image
 
 def avi_convert_jp2():
@@ -17,15 +19,14 @@ def avi_convert_jp2():
 
     log_file = args.log_file
     log_level = logging.getLevelName(args.log_level.upper())
+
     if not log_file:
-        logging.basicConfig(stream=sys.stdout, level=log_level)
+        logging.basicConfig(level=log_level)
     else:
-        logging.basicConfig(filename=log_file, level=log_level)
+        logging.basicConfig(filename=log_file, level=log_level, filemode='a+')
 
     avi_jp2_convert = AviJp2Image(args.src_file_path)
     avi_jp2_convert.convert_to_jp2()
-
-    if avi_jp2_convert.result.get('success') is False:
-        sys.exit(avi_jp2_convert.json_result())
-
-    print(avi_jp2_convert.json_result(), flush=True)
+    json_result = avi_jp2_convert.json_result()
+    print("{}".format(json_result), end='')
+    sys.exit(0)
