@@ -67,37 +67,48 @@ class AviJp2Image:
     Class that checks and converts a source tiff image to a jp2 derivative
     """
     def __init__(self, input_file_path: Union[str, Path],
-                output_dir: Union[str, Path]=avi_const.DERIVATIVES_OUT_FOLDER,
+                destination_file: Union[str, Path],
                 console_debug: bool=avi_const.CONSOLE_DEBUG_MODE) -> None:
         self.image_data = AviImageData(input_file_path)
         self.kakadu = Kakadu(kakadu_base_path=avi_const.KAKADU_BASE_PATH)
         self.converter = AviConverter(exiftool_path=avi_const.EXIFTOOL_PATH, quiet=not console_debug)
-        self.output_dir = output_dir
-        self.result = {}
+        self.destination_file = destination_file
+        self.success = True
+        self.result_message = ''
         self.logger = logging.getLogger(__name__)
         if console_debug:
             self.logger.setLevel(logging.DEBUG)
             self.logger.addHandler(logging.StreamHandler(sys.stdout))
 
-    @property
     def result(self) -> dict:
-        return self._result
-
-    @result.setter
-    def result(self, res: dict) -> None:
-        self._result = res
+        return { 'success': self.success, 'message': self.result_message }
 
     @property
-    def output_dir(self) -> str:
-        return self._output_dir
+    def success(self) -> bool:
+        return self.__success
 
-    @output_dir.setter
-    def output_dir(self, out_dir: Union[str, Path]) -> None:
-        Path(str(out_dir)).mkdir(parents=True, exist_ok=True)
-        self._output_dir = str(out_dir)
+    @success.setter
+    def success(self, new_success: bool) -> None:
+        self.__success = new_success
+
+    @property
+    def result_message(self) -> str:
+        return self.__result_message
+
+    @result_message.setter
+    def result_message(self, new_message: str) -> None:
+        self.__result_message = new_message
+
+    @property
+    def destination_file(self) -> str:
+        return self.__destination_file
+
+    @destination_file.setter
+    def destination_file(self, destination_file: Union[str, Path]) -> None:
+        self.__destination_file = str(destination_file)
 
     def json_result(self) -> str:
-        return json.dumps(self.result)
+        return json.dumps(self.result())
 
     def convert_to_jp2(self) -> None:
         try:
@@ -106,7 +117,6 @@ class AviJp2Image:
 
             kdu_args = self.__calculate_kdu_options() + self.__calculate_kdu_recipe()
             input_file = str(self.image_data.image_src_path)
-            jp2_out_file = f'{self.output_dir}/{self.__get_out_filename(ext=".jp2")}'
 
             if self.image_data.src_quality == 'color':
                 self.logger.debug('Adding icc profile to image')
@@ -132,30 +142,31 @@ class AviJp2Image:
 
             self.logger.debug('Kakadu args are {}'.format(kdu_args))
             self.logger.debug('Preparing to output jp2...')
-
             try:
-                self.kakadu.kdu_compress(input_file, jp2_out_file, kakadu_options=kdu_args)
+                self.kakadu.kdu_compress(input_file, self.destination_file, kakadu_options=kdu_args)
             except (KakaduError, OSError) as kdu_e:
                 msg = f'{kdu_e.__class__.__name__} {kdu_e}'
                 self.__set_error_result(msg)
                 raise AviJp2ImageError(msg) from kdu_e
             self.logger.debug('Successfully converted to jp2!')
-            self.__set_success_result(jp2_out_file)
+            self.__set_success_result()
         except AviJp2ImageError:
             self.logger.error('Error Occured processing file check result to see details')
 
     def convert_icc_profile(self) -> str:
         try:
-            out_file = f'{self.output_dir}/{self.__get_out_filename(ext=self.image_data.image_ext(), prefix="icc_converted_")}'
+            #pylint: disable=consider-using-with
+            out_file = tempfile.NamedTemporaryFile(prefix='image_processing-icc-convert-out', suffix=self.image_data.image_ext(), delete=False)
+            #pylint: enable=consider-using-with
             with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix=self.image_data.image_ext()) as temp_tiff_file_obj:
                 temp_tiff_filepath = temp_tiff_file_obj.name
                 shutil.copy(str(self.image_data.image_src_path), temp_tiff_filepath)
                 if self.image_data.needs_icc_profile():
-                    self.__convert_icc_profile_with_magick(temp_tiff_filepath, out_file)
+                    self.__convert_icc_profile_with_magick(temp_tiff_filepath, out_file.name)
                 else:
                     self.logger.debug('Adding icc profile with pillow..')
-                    self.converter.convert_icc_profile(temp_tiff_filepath, out_file, str(avi_const.ICC_PROFILE_PATH))
-            return out_file
+                    self.converter.convert_icc_profile(temp_tiff_filepath, out_file.name, str(avi_const.ICC_PROFILE_PATH))
+            return out_file.name
         except (AssertionError, PyCMSError, ImageProcessingError, IOError) as a_e:
             msg = f'{a_e.__class__.__name__}{a_e}'
             self.__set_error_result(msg)
@@ -195,12 +206,11 @@ class AviJp2Image:
                 '-jp2_space', f'{self.image_data.jp2_space()}'
         ] + avi_const.KAKADU_DEFAULT_OPTIONS
 
-    def __get_out_filename(self, ext: str, prefix: str='') -> str:
-        return f'{prefix}{self.image_data.image_src_path.stem}{ext}'
-
-    def __set_success_result(self, jp2_file_path: str) -> None:
-        self.result = {'success': True, 'jp2_file_path': jp2_file_path}
+    def __set_success_result(self) -> None:
+        self.success = True
+        self.result_message = f'Successfully converted and wrote file to {self.destination_file}'
 
     def __set_error_result(self, error_msg: str='') -> None:
         self.logger.error(error_msg)
-        self.result = {'success': False, 'error_msg': error_msg}
+        self.success = False
+        self.result_message = error_msg

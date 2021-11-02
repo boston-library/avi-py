@@ -23,7 +23,6 @@ addons:
 env:
   global:
     - KAKADU_HOME_PATH=/opt/kakadu
-    - AVI_FILES_DIR="${HOME}/avi-files"
     - AVI_DEBUG=true
     - MAGICK_MEMORY_LIMIT=512
 
