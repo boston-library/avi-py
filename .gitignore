@@ -21,3 +21,4 @@ __pycache__
 site
 scratch.py
 .python-version
+build/

@@ -2,13 +2,7 @@
 import os
 from pathlib import Path
 
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
-KAKADU_BASE_PATH=os.getenv('KAKADU_HOME_PATH')
+KAKADU_BASE_PATH=os.getenv('KAKADU_HOME')
 CONSOLE_DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
 # NOTE: May not need the source folder path below. But definetley in the avi processor
 PROJECT_ROOT=Path(__file__).parent.parent
@@ -23,7 +17,7 @@ IMAGE_DEFAULT_COMPRESSION=10
 IMAGE_MAX_LEVEL_SIZE=96
 
 KAKADU_DEFAULT_OPTIONS=[
-    '-num_threads', '4',
+    '-num_threads', str(os.cpu_count()),
     '-double_buffering', '10',
     '-flush_period', '1024',
     '-no_weights'
