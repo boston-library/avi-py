@@ -8,6 +8,7 @@ opencv-python = ">3.4"
 image-processing = {editable = true, ref = "1.9.1", git = "https://github.com/bodleian/image-processing.git"}
 urllib3 = ">=1.26.5"
 pillow = ">=8.3.2"
+avi-py = {editable = true, path = "."}
 
 [dev-packages]
 pytest = ">=6.2"
@@ -15,7 +16,6 @@ pylint = "~=2.7"
 coveralls = "~=3.0"
 pytest-cov = "~=2.11"
 pipenv-setup = "~=3.1"
-avi-py = {editable = true, path = "."}
 
 [requires]
 python_version = "3.8"
