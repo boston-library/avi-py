@@ -28,8 +28,8 @@ def avi_convert_jp2():
 
     avi_jp2_convert = AviJp2Image(args.src_file_path, args.dest_file_path)
     avi_jp2_convert.convert_to_jp2()
+    json_result = avi_jp2_convert.json_result()
     if avi_jp2_convert.success:
-        json_result = avi_jp2_convert.json_result()
         print("{}".format(json_result), end='')
     else:
         sys.exit("Error! {}".format(json_result))
