@@ -1,9 +1,8 @@
-
 import os
 from pathlib import Path
 
-KAKADU_BASE_PATH=os.getenv('KAKADU_HOME')
-CONSOLE_DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
+KAKADU_BASE_PATH=os.getenv('KAKADU_HOME', '')
+CONSOLE_DEBUG_MODE=(str(os.getenv('AVI_DEBUG', 'false')).lower() == 'true')
 # NOTE: May not need the source folder path below. But definetley in the avi processor
 PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
@@ -16,13 +15,28 @@ KDU_DEFAULT_TILE_SIZE=1024
 IMAGE_DEFAULT_COMPRESSION=10
 IMAGE_MAX_LEVEL_SIZE=96
 
+# Get screenshot five seconds into video
+FFMPEG_DEFAULT_SS_TIME=0.05
+
 KAKADU_DEFAULT_OPTIONS=[
     '-num_threads', str(os.cpu_count()),
     '-double_buffering', '10',
     '-flush_period', '1024',
     '-no_weights'
 ]
-if not CONSOLE_DEBUG_MODE:
+if CONSOLE_DEBUG_MODE:
+    MAGICK_DEFAULT_CONVERT_COMMANDS=[
+        'convert',
+        '-compress',
+        'none'
+    ]
+else:
+    MAGICK_DEFAULT_CONVERT_COMMANDS=[
+        'convert',
+        '-compress',
+        '-quiet',
+        '-none'
+    ]
     KAKADU_DEFAULT_OPTIONS += ['-quiet']
 
 KAKADU_DEFAULT_RECIPE=[

@@ -5,7 +5,7 @@ from typing import Union
 from PIL import Image
 from image_processing import validation
 
-from avi_py import constants as avi_const
+from . import constants as avi_const
 
 class AviImageData:
     """
@@ -118,3 +118,5 @@ class AviImageData:
             rates.append(cmp)
             cmp = round((cmp / 1.618), 8)
         return ",".join([str(cmp) for cmp in rates])
+
+__all__ = ['AviImageData']

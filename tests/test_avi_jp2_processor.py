@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory, NamedTemporaryFile
 from pathlib import Path
 from image_processing import conversion
 from image_processing.kakadu import Kakadu
-from avi_py.avi_jp2_image import AviJp2Image
+from avi_py.avi_jp2_processor import AviJp2Processor
 from avi_py.avi_image_data import AviImageData
 
 from . import file_fixtures
@@ -43,11 +43,11 @@ def no_icc_destination_file(temp_folder):
     yield dest_file.name
     dest_file.close()
 
-class TestAviJp2Image:
+class TestAviJp2Convert:
     def test_grayscaled_image_convert(self, temp_folder, grayscaled_destination_file):
-        grayscaled_image_convert = AviJp2Image(input_file_path=file_fixtures.GRAYSCALED_IMAGE, destination_file=grayscaled_destination_file, console_debug=False)
+        grayscaled_image_convert = AviJp2Processor.process_jp2(file_fixtures.GRAYSCALED_IMAGE, destination_file=grayscaled_destination_file)
 
-        assert isinstance(grayscaled_image_convert, AviJp2Image)
+        assert isinstance(grayscaled_image_convert, AviJp2Processor)
         assert isinstance(grayscaled_image_convert.image_data, AviImageData)
 
         assert grayscaled_image_convert.destination_file == grayscaled_destination_file
@@ -59,7 +59,6 @@ class TestAviJp2Image:
         assert isinstance(grayscaled_image_convert.result_message, str)
         assert isinstance(grayscaled_image_convert.result(), dict)
 
-        grayscaled_image_convert.convert_to_jp2()
         for key in ['success', 'message']:
             assert key in grayscaled_image_convert.result().keys()
 
@@ -73,9 +72,9 @@ class TestAviJp2Image:
         assert grayscaled_image_convert.json_result() == json.dumps(grayscaled_image_convert.result())
 
     def test_srgb_image_convert(self, temp_folder, srgb_destination_file):
-        srgb_image_convert = AviJp2Image(input_file_path=file_fixtures.SRGB_IMAGE, destination_file=srgb_destination_file, console_debug=False)
+        srgb_image_convert = AviJp2Processor.process_jp2(file_fixtures.SRGB_IMAGE, srgb_destination_file)
 
-        assert isinstance(srgb_image_convert, AviJp2Image)
+        assert isinstance(srgb_image_convert, AviJp2Processor)
         assert isinstance(srgb_image_convert.image_data, AviImageData)
 
         assert srgb_image_convert.destination_file == srgb_destination_file
@@ -87,7 +86,6 @@ class TestAviJp2Image:
         assert isinstance(srgb_image_convert.result_message, str)
         assert isinstance(srgb_image_convert.result(), dict)
 
-        srgb_image_convert.convert_to_jp2()
         for key in ['success', 'message']:
             assert key in srgb_image_convert.result().keys()
 
@@ -101,9 +99,9 @@ class TestAviJp2Image:
         assert srgb_image_convert.json_result() == json.dumps(srgb_image_convert.result())
 
     def test_no_icc_image_convert(self, temp_folder, no_icc_destination_file):
-        no_icc_image_convert = AviJp2Image(input_file_path=file_fixtures.NO_ICC_IMAGE, destination_file=no_icc_destination_file, console_debug=False)
+        no_icc_image_convert = AviJp2Processor.process_jp2(file_fixtures.NO_ICC_IMAGE, no_icc_destination_file)
 
-        assert isinstance(no_icc_image_convert, AviJp2Image)
+        assert isinstance(no_icc_image_convert, AviJp2Processor)
         assert isinstance(no_icc_image_convert.image_data, AviImageData)
 
         assert no_icc_image_convert.destination_file == no_icc_destination_file
@@ -115,7 +113,6 @@ class TestAviJp2Image:
         assert isinstance(no_icc_image_convert.result_message, str)
         assert isinstance(no_icc_image_convert.result(), dict)
 
-        no_icc_image_convert.convert_to_jp2()
         for key in ['success', 'message']:
             assert key in no_icc_image_convert.result().keys()
 

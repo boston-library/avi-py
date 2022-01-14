@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 from __future__ import print_function
+from __future__ import annotations
 
 import tempfile
 import shutil
 import logging
 import subprocess
-import sys
 import json
 import os
 from pathlib import Path
@@ -16,15 +16,16 @@ from image_processing.conversion import Converter
 from image_processing.kakadu import Kakadu
 from PIL import Image
 from PIL.ImageCms import PyCMSError
+from . import constants as avi_const
+from .avi_image_data import AviImageData
 
-from avi_py import constants as avi_const
-from avi_py.avi_image_data import AviImageData
-
-#pylint: disable=missing-class-docstring
-class AviJp2ImageError(Exception):
+#pylint: disable=unnecessary-pass
+class AviJp2ProcessorError(Exception):
+    """
+    Top level Avi jp2 processor exception class
+    """
     pass
-
-#pylint: enable=missing-class-docstring
+#pylint: enable=unnecessary-pass
 
 class AviConverter(Converter):
     """
@@ -62,23 +63,24 @@ class AviConverter(Converter):
 #pylint: enable=raise-missing-from
 
 
-class AviJp2Image:
+class AviJp2Processor:
     """
     Class that checks and converts a source tiff image to a jp2 derivative
     """
-    def __init__(self, input_file_path: Union[str, Path],
-                destination_file: Union[str, Path],
-                console_debug: bool=avi_const.CONSOLE_DEBUG_MODE) -> None:
+    def __init__(self, input_file_path: Union[str, Path], destination_file: Union[str, Path]) -> None:
         self.image_data = AviImageData(input_file_path)
         self.kakadu = Kakadu(kakadu_base_path=avi_const.KAKADU_BASE_PATH)
-        self.converter = AviConverter(exiftool_path=avi_const.EXIFTOOL_PATH, quiet=not console_debug)
+        self.converter = AviConverter(exiftool_path=avi_const.EXIFTOOL_PATH, quiet=not avi_const.CONSOLE_DEBUG_MODE)
         self.destination_file = destination_file
         self.success = True
         self.result_message = ''
-        self.logger = logging.getLogger(__name__)
-        if console_debug:
-            self.logger.setLevel(logging.DEBUG)
-            self.logger.addHandler(logging.StreamHandler(sys.stdout))
+        self.logger = logging.getLogger('avi_py')
+
+    @classmethod
+    def process_jp2(cls, input_file_path: Union[str, Path], destination_file: Union[str, Path]) -> AviJp2Processor:
+        jp2_converter = cls(input_file_path, destination_file)
+        jp2_converter.convert_to_jp2()
+        return jp2_converter
 
     def result(self) -> dict:
         return { 'success': self.success, 'message': self.result_message }
@@ -96,8 +98,8 @@ class AviJp2Image:
         return self.__result_message
 
     @result_message.setter
-    def result_message(self, new_message: str) -> None:
-        self.__result_message = new_message
+    def result_message(self, message: str) -> None:
+        self.__result_message = message
 
     @property
     def destination_file(self) -> str:
@@ -113,7 +115,7 @@ class AviJp2Image:
     def convert_to_jp2(self) -> None:
         try:
             if not self.image_data.valid_image_ext():
-                raise AviJp2ImageError('Source image is not a .tiff or .tif')
+                raise AviJp2ProcessorError('Source image is not a .tiff or .tif')
 
             kdu_args = self.__calculate_kdu_options() + self.__calculate_kdu_recipe()
             input_file = str(self.image_data.image_src_path)
@@ -131,7 +133,7 @@ class AviJp2Image:
             except ValidationError as v_e:
                 msg = f'ValidationError: {v_e}'
                 self.__set_error_result(msg)
-                raise AviJp2ImageError(msg) from v_e
+                raise AviJp2ProcessorError(msg) from v_e
 
             self.logger.debug('image {} is able to be converted to jp2!'.format(input_file))
 
@@ -147,10 +149,10 @@ class AviJp2Image:
             except (KakaduError, OSError) as kdu_e:
                 msg = f'{kdu_e.__class__.__name__} {kdu_e}'
                 self.__set_error_result(msg)
-                raise AviJp2ImageError(msg) from kdu_e
+                raise AviJp2ProcessorError(msg) from kdu_e
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result()
-        except AviJp2ImageError:
+        except AviJp2ProcessorError:
             self.logger.error('Error Occured processing file check result to see details')
 
     def convert_icc_profile(self) -> str:
@@ -170,21 +172,14 @@ class AviJp2Image:
         except (AssertionError, PyCMSError, ImageProcessingError, IOError) as a_e:
             msg = f'{a_e.__class__.__name__}{a_e}'
             self.__set_error_result(msg)
-            raise AviJp2ImageError(msg) from a_e
+            raise AviJp2ProcessorError(msg) from a_e
 
     def __convert_icc_profile_with_magick(self, input_file: str, out_file: str) -> None:
         assert shutil.which('convert') is not None, 'imagemagick not installed on this system!'
 
         icc_profile_path = str(avi_const.ICC_PROFILE_PATH)
-        magick_commands = [
-            'convert',
-            '-quiet',
-            '-compress',
-            'none',
-            input_file,
-            '-profile', icc_profile_path,
-            out_file
-        ]
+        magick_commands = avi_const.MAGICK_DEFAULT_CONVERT_COMMANDS.copy()
+        magick_commands.extend([input_file, '-profile', icc_profile_path, out_file])
         self.logger.debug('Converting icc profile with the following imagemagick commands...')
         self.logger.debug(magick_commands)
         try:
@@ -214,3 +209,5 @@ class AviJp2Image:
         self.logger.error(error_msg)
         self.success = False
         self.result_message = error_msg
+
+__all__ = ['AviJp2Processor', 'AviJp2ProcessorError', 'AviConverter']
