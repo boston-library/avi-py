@@ -8,7 +8,7 @@ CONSOLE_DEBUG_MODE=(os.getenv('AVI_DEBUG', 'false').lower() == 'true')
 PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
 EXIFTOOL_PATH=os.getenv('EXIFTOOL_PATH', 'exiftool')
-COLOR_MODES=['RGB', 'RGBA', 'P', 'PA']
+COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
 
 KDU_DEFAULT_LAYER_COUNT=8
