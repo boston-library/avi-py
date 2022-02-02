@@ -62,7 +62,7 @@ class AviImageData:
     def src_quality(self, img: Image) -> None:
         if img.mode in avi_const.COLOR_MODES:
             self._src_quality = 'color'
-        elif img.mode == validation.GREYSCALE:
+        elif img.mode in validation.MONOTONE_COLOUR_MODES:
             self._src_quality = 'gray'
         else:
             raise IOError(f'Unknown Image mode {img.mode}')
