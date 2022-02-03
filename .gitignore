@@ -22,3 +22,7 @@ site
 scratch.py
 .python-version
 build/
+
+#logs
+logs/*
+!/logs/.keep

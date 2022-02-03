@@ -7,7 +7,7 @@ name = "pypi"
 opencv-python = ">3.4"
 image-processing = {editable = true, ref = "1.9.1", git = "https://github.com/bodleian/image-processing.git"}
 urllib3 = ">=1.26.5"
-pillow = ">=8.3.2"
+pillow = ">=9.0.0"
 avi-py = {editable = true, path = "."}
 
 [dev-packages]
