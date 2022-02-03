@@ -9,6 +9,7 @@ image-processing = {editable = true, ref = "1.9.1", git = "https://github.com/bo
 urllib3 = ">=1.26.5"
 pillow = ">=9.0.0"
 ffmpeg-python = ">=0.2.0"
+numpy = ">=1.21"
 
 [dev-packages]
 pytest = ">=6.2"
