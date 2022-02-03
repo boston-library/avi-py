@@ -148,6 +148,11 @@ class AviJp2Image:
                 msg = f'{kdu_e.__class__.__name__} {kdu_e}'
                 self.__set_error_result(msg)
                 raise AviJp2ImageError(msg) from kdu_e
+            finally:
+                # Deletes the tmp file created from the convert_icc_profile method.
+                if Path(input_file).exists() and input_file != str(self.image_data.image_src_path):
+                    self.logger.debug('Removing {}'.format(input_file))
+                    os.unlink(input_file)
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result()
         except AviJp2ImageError:

@@ -127,7 +127,7 @@ setup(
         "packaging==20.9; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
         "pathspec==0.9.0",
         "pep517==0.11.0",
-        "pillow==8.3.2",
+        "pillow>=9.0.0",
         "pip-shims==0.5.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
         "pipenv-setup==3.1.1",
         "pipfile==0.0.2",
