@@ -20,6 +20,8 @@ from PIL.ImageCms import PyCMSError
 from avi_py import constants as avi_const
 from avi_py.avi_image_data import AviImageData
 
+Image.MAX_IMAGE_PIXELS = None
+
 #pylint: disable=missing-class-docstring
 class AviJp2ImageError(Exception):
     pass
