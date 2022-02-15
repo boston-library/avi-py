@@ -44,8 +44,8 @@ class TestAviImageData:
         assert isinstance(grayscaled_image_data.compression_numerator, int)
         assert grayscaled_image_data.compression_numerator == avi_const.IMAGE_DEFAULT_COMPRESSION
 
-        assert isinstance(grayscaled_image_data.image_ext(), str)
-        assert grayscaled_image_data.image_ext() == '.tif'
+        assert isinstance(grayscaled_image_data.image_ext, str)
+        assert grayscaled_image_data.image_ext == '.tif'
 
         assert isinstance(grayscaled_image_data.valid_image_ext(), bool)
         assert grayscaled_image_data.valid_image_ext() == True
@@ -82,8 +82,8 @@ class TestAviImageData:
         assert isinstance(srgb_image_data.compression_numerator, int)
         assert srgb_image_data.compression_numerator == avi_const.IMAGE_DEFAULT_COMPRESSION
 
-        assert isinstance(srgb_image_data.image_ext(), str)
-        assert srgb_image_data.image_ext() == '.tiff'
+        assert isinstance(srgb_image_data.image_ext, str)
+        assert srgb_image_data.image_ext == '.tiff'
 
         assert isinstance(srgb_image_data.valid_image_ext(), bool)
         assert srgb_image_data.valid_image_ext() == True
@@ -120,8 +120,8 @@ class TestAviImageData:
         assert isinstance(no_icc_profile_image.compression_numerator, int)
         assert no_icc_profile_image.compression_numerator == avi_const.IMAGE_DEFAULT_COMPRESSION
 
-        assert isinstance(no_icc_profile_image.image_ext(), str)
-        assert no_icc_profile_image.image_ext() == '.tif'
+        assert isinstance(no_icc_profile_image.image_ext, str)
+        assert no_icc_profile_image.image_ext == '.tif'
 
         assert isinstance(no_icc_profile_image.valid_image_ext(), bool)
         assert no_icc_profile_image.valid_image_ext() == True

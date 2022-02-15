@@ -23,7 +23,7 @@ from .avi_image_data import AviImageData
 Image.MAX_IMAGE_PIXELS = None
 
 #pylint: disable=missing-class-docstring
-class AviJp2ImageError(Exception):
+class AviJp2ProcessorError(Exception):
     pass
 
 #pylint: enable=missing-class-docstring
@@ -83,6 +83,7 @@ class AviJp2Processor:
         jp2_converter.convert_to_jp2()
         return jp2_converter
 
+    @property
     def result(self) -> dict:
         return { 'success': self.success, 'message': self.result_message }
 
@@ -158,15 +159,17 @@ class AviJp2Processor:
                     os.unlink(input_file)
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result()
-        except AviJp2ProcessorError:
-            self.logger.error('Error Occured processing file check result to see details')
+        except AviJp2ProcessorError as avi_ex:
+            self.logger.error('Error Occured processing file for Jp2 conversion!')
+            self.logger.error('Details: {}'.format(str(avi_ex)))
+            self.logger.error('Check result and logs to see additional details')
 
     def convert_icc_profile(self) -> str:
         try:
             #pylint: disable=consider-using-with
-            out_file = tempfile.NamedTemporaryFile(prefix='image_processing-icc-convert-out', suffix=self.image_data.image_ext(), delete=False)
+            out_file = tempfile.NamedTemporaryFile(prefix='image_processing-icc-convert-out', suffix=self.image_data.image_ext, delete=False)
             #pylint: enable=consider-using-with
-            with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix=self.image_data.image_ext()) as temp_tiff_file_obj:
+            with tempfile.NamedTemporaryFile(prefix='image-processing_', suffix=self.image_data.image_ext) as temp_tiff_file_obj:
                 temp_tiff_filepath = temp_tiff_file_obj.name
                 shutil.copy(str(self.image_data.image_src_path), temp_tiff_filepath)
                 if self.image_data.needs_icc_profile():

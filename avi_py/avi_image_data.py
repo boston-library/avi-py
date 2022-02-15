@@ -35,7 +35,7 @@ class AviImageData:
     def image_src_path(self, image_src_path: Union[str, Path]) -> None:
         if not isinstance(image_src_path, Path):
             image_src_path = Path(image_src_path)
-        if not image_src_path.is_file():
+        if not image_src_path.exists() or not image_src_path.is_file():
             raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), str(image_src_path))
         self._image_src_path = image_src_path
@@ -93,11 +93,12 @@ class AviImageData:
     def compression_numerator(self, compression_numerator: int) -> None:
         self._compression_numerator = compression_numerator
 
+    @property
     def image_ext(self) -> str:
         return self.image_src_path.suffix
 
     def valid_image_ext(self) -> bool:
-        return self.image_ext() in avi_const.VALID_IMAGE_EXTENSIONS
+        return self.image_ext in avi_const.VALID_IMAGE_EXTENSIONS
 
     def jp2_space(self) -> str:
         return 'sRGB' if self.src_quality == 'color' else 'sLUM'

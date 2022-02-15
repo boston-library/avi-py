@@ -9,6 +9,7 @@ ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_s
 EXIFTOOL_PATH=os.getenv('EXIFTOOL_PATH', 'exiftool')
 COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
+VALID_VIDEO_EXTENSIONS=['.mov', '.mp4']
 
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024
@@ -16,7 +17,7 @@ IMAGE_DEFAULT_COMPRESSION=10
 IMAGE_MAX_LEVEL_SIZE=96
 
 # Get screenshot five seconds into video
-FFMPEG_DEFAULT_SS_TIME=0.05
+FFMPEG_DEFAULT_SS_TIME=5
 
 KAKADU_DEFAULT_OPTIONS=[
     '-num_threads', str(os.cpu_count()),

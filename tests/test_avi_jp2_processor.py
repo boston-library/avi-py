@@ -57,19 +57,19 @@ class TestAviJp2Convert:
 
         assert isinstance(grayscaled_image_convert.success, bool)
         assert isinstance(grayscaled_image_convert.result_message, str)
-        assert isinstance(grayscaled_image_convert.result(), dict)
+        assert isinstance(grayscaled_image_convert.result, dict)
 
         for key in ['success', 'message']:
-            assert key in grayscaled_image_convert.result().keys()
+            assert key in grayscaled_image_convert.result.keys()
 
         assert grayscaled_image_convert.success == True
-        assert grayscaled_image_convert.result().get('success') == True
+        assert grayscaled_image_convert.result.get('success') == True
 
         assert grayscaled_image_convert.result_message ==  f'Successfully converted and wrote file to {grayscaled_destination_file}'
-        assert grayscaled_image_convert.result().get('message') == f'Successfully converted and wrote file to {grayscaled_destination_file}'
+        assert grayscaled_image_convert.result.get('message') == f'Successfully converted and wrote file to {grayscaled_destination_file}'
 
         assert isinstance(grayscaled_image_convert.json_result(), str)
-        assert grayscaled_image_convert.json_result() == json.dumps(grayscaled_image_convert.result())
+        assert grayscaled_image_convert.json_result() == json.dumps(grayscaled_image_convert.result)
 
     def test_srgb_image_convert(self, temp_folder, srgb_destination_file):
         srgb_image_convert = AviJp2Processor.process_jp2(file_fixtures.SRGB_IMAGE, srgb_destination_file)
@@ -84,19 +84,19 @@ class TestAviJp2Convert:
 
         assert isinstance(srgb_image_convert.success, bool)
         assert isinstance(srgb_image_convert.result_message, str)
-        assert isinstance(srgb_image_convert.result(), dict)
+        assert isinstance(srgb_image_convert.result, dict)
 
         for key in ['success', 'message']:
-            assert key in srgb_image_convert.result().keys()
+            assert key in srgb_image_convert.result.keys()
 
         assert srgb_image_convert.success == True
-        assert srgb_image_convert.result().get('success') == True
+        assert srgb_image_convert.result.get('success') == True
 
         assert srgb_image_convert.result_message ==  f'Successfully converted and wrote file to {srgb_destination_file}'
-        assert srgb_image_convert.result().get('message') == f'Successfully converted and wrote file to {srgb_destination_file}'
+        assert srgb_image_convert.result.get('message') == f'Successfully converted and wrote file to {srgb_destination_file}'
 
         assert isinstance(srgb_image_convert.json_result(), str)
-        assert srgb_image_convert.json_result() == json.dumps(srgb_image_convert.result())
+        assert srgb_image_convert.json_result() == json.dumps(srgb_image_convert.result)
 
     def test_no_icc_image_convert(self, temp_folder, no_icc_destination_file):
         no_icc_image_convert = AviJp2Processor.process_jp2(file_fixtures.NO_ICC_IMAGE, no_icc_destination_file)
@@ -111,16 +111,16 @@ class TestAviJp2Convert:
 
         assert isinstance(no_icc_image_convert.success, bool)
         assert isinstance(no_icc_image_convert.result_message, str)
-        assert isinstance(no_icc_image_convert.result(), dict)
+        assert isinstance(no_icc_image_convert.result, dict)
 
         for key in ['success', 'message']:
-            assert key in no_icc_image_convert.result().keys()
+            assert key in no_icc_image_convert.result.keys()
 
         assert no_icc_image_convert.success == True
-        assert no_icc_image_convert.result().get('success') == True
+        assert no_icc_image_convert.result.get('success') == True
 
         assert no_icc_image_convert.result_message == f'Successfully converted and wrote file to {no_icc_destination_file}'
-        assert no_icc_image_convert.result().get('message') == f'Successfully converted and wrote file to {no_icc_destination_file}'
+        assert no_icc_image_convert.result.get('message') == f'Successfully converted and wrote file to {no_icc_destination_file}'
 
         assert isinstance(no_icc_image_convert.json_result(), str)
-        assert no_icc_image_convert.json_result() == json.dumps(no_icc_image_convert.result())
+        assert no_icc_image_convert.json_result() == json.dumps(no_icc_image_convert.result)
