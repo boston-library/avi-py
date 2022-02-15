@@ -7,6 +7,8 @@ from image_processing import validation
 
 from . import constants as avi_const
 
+Image.MAX_IMAGE_PIXELS = None
+
 class AviImageData:
     """
     Class for storing all low level image data for functions that are used to populate

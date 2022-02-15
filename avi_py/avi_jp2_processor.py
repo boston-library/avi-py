@@ -6,6 +6,7 @@ import tempfile
 import shutil
 import logging
 import subprocess
+import sys
 import json
 import os
 from pathlib import Path
@@ -19,13 +20,13 @@ from PIL.ImageCms import PyCMSError
 from . import constants as avi_const
 from .avi_image_data import AviImageData
 
-#pylint: disable=unnecessary-pass
-class AviJp2ProcessorError(Exception):
-    """
-    Top level Avi jp2 processor exception class
-    """
+Image.MAX_IMAGE_PIXELS = None
+
+#pylint: disable=missing-class-docstring
+class AviJp2ImageError(Exception):
     pass
-#pylint: enable=unnecessary-pass
+
+#pylint: enable=missing-class-docstring
 
 class AviConverter(Converter):
     """
