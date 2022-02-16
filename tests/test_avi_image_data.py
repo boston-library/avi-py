@@ -10,19 +10,19 @@ from . import file_fixtures
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
-def get_image_data(image_path):
+def get_image_data(image_path: str) -> AviImageData:
     return AviImageData(image_path)
 
 @pytest.fixture
-def grayscaled_image_data():
+def grayscaled_image_data() -> AviImageData:
     return get_image_data(file_fixtures.GRAYSCALED_IMAGE)
 
 @pytest.fixture
-def srgb_image_data():
+def srgb_image_data() -> AviImageData:
     return get_image_data(file_fixtures.SRGB_IMAGE)
 
 @pytest.fixture
-def no_icc_profile_image():
+def no_icc_profile_image() -> AviImageData:
     return get_image_data(file_fixtures.NO_ICC_IMAGE)
 
 class TestAviImageData:
@@ -48,13 +48,13 @@ class TestAviImageData:
         assert grayscaled_image_data.image_ext == '.tif'
 
         assert isinstance(grayscaled_image_data.valid_image_ext(), bool)
-        assert grayscaled_image_data.valid_image_ext() == True
+        assert grayscaled_image_data.valid_image_ext() is True
 
         assert isinstance(grayscaled_image_data.jp2_space(), str)
         assert grayscaled_image_data.jp2_space() == 'sLUM'
 
         assert isinstance(grayscaled_image_data.needs_icc_profile(), bool)
-        assert grayscaled_image_data.needs_icc_profile() == False
+        assert grayscaled_image_data.needs_icc_profile() is False
 
         assert isinstance(grayscaled_image_data.long_dim, int)
         assert isinstance(grayscaled_image_data.level_count_for_size(), int)
@@ -86,13 +86,13 @@ class TestAviImageData:
         assert srgb_image_data.image_ext == '.tiff'
 
         assert isinstance(srgb_image_data.valid_image_ext(), bool)
-        assert srgb_image_data.valid_image_ext() == True
+        assert srgb_image_data.valid_image_ext() is True
 
         assert isinstance(srgb_image_data.jp2_space(), str)
         assert srgb_image_data.jp2_space() == 'sRGB'
 
         assert isinstance(srgb_image_data.needs_icc_profile(), bool)
-        assert srgb_image_data.needs_icc_profile() == False
+        assert srgb_image_data.needs_icc_profile() is False
 
         assert isinstance(srgb_image_data.long_dim, int)
         assert isinstance(srgb_image_data.level_count_for_size(), int)
@@ -124,13 +124,13 @@ class TestAviImageData:
         assert no_icc_profile_image.image_ext == '.tif'
 
         assert isinstance(no_icc_profile_image.valid_image_ext(), bool)
-        assert no_icc_profile_image.valid_image_ext() == True
+        assert no_icc_profile_image.valid_image_ext() is True
 
         assert isinstance(no_icc_profile_image.jp2_space(), str)
         assert no_icc_profile_image.jp2_space() == 'sRGB'
 
         assert isinstance(no_icc_profile_image.needs_icc_profile(), bool)
-        assert no_icc_profile_image.needs_icc_profile() == True
+        assert no_icc_profile_image.needs_icc_profile() is True
 
         assert isinstance(no_icc_profile_image.long_dim, int)
         assert isinstance(no_icc_profile_image.level_count_for_size(), int)

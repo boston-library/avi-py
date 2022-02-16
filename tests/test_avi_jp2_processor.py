@@ -16,7 +16,7 @@ from . import file_fixtures
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 @pytest.fixture(scope='module')
-def temp_folder(prefix='avi_test_files', dir='/tmp'):
+def temp_folder(prefix='avi_test_image_files', dir='/tmp'):
     temp_dir = TemporaryDirectory(prefix=prefix, dir=dir)
     print(f'Created temp file at {temp_dir.name}')
     yield temp_dir.name
@@ -56,17 +56,18 @@ class TestAviJp2Convert:
         assert isinstance(grayscaled_image_convert.converter, conversion.Converter)
 
         assert isinstance(grayscaled_image_convert.success, bool)
+
         assert isinstance(grayscaled_image_convert.result_message, str)
         assert isinstance(grayscaled_image_convert.result, dict)
 
         for key in ['success', 'message']:
             assert key in grayscaled_image_convert.result.keys()
 
-        assert grayscaled_image_convert.success == True
-        assert grayscaled_image_convert.result.get('success') == True
+        assert grayscaled_image_convert.success is True
+        assert grayscaled_image_convert.success == grayscaled_image_convert.result.get('success')
 
         assert grayscaled_image_convert.result_message ==  f'Successfully converted and wrote file to {grayscaled_destination_file}'
-        assert grayscaled_image_convert.result.get('message') == f'Successfully converted and wrote file to {grayscaled_destination_file}'
+        assert grayscaled_image_convert.result_message == grayscaled_image_convert.result.get('message')
 
         assert isinstance(grayscaled_image_convert.json_result(), str)
         assert grayscaled_image_convert.json_result() == json.dumps(grayscaled_image_convert.result)
@@ -89,11 +90,11 @@ class TestAviJp2Convert:
         for key in ['success', 'message']:
             assert key in srgb_image_convert.result.keys()
 
-        assert srgb_image_convert.success == True
-        assert srgb_image_convert.result.get('success') == True
+        assert srgb_image_convert.success is True
+        assert srgb_image_convert.success == srgb_image_convert.result.get('success')
 
         assert srgb_image_convert.result_message ==  f'Successfully converted and wrote file to {srgb_destination_file}'
-        assert srgb_image_convert.result.get('message') == f'Successfully converted and wrote file to {srgb_destination_file}'
+        assert srgb_image_convert.result_message == srgb_image_convert.result.get('message')
 
         assert isinstance(srgb_image_convert.json_result(), str)
         assert srgb_image_convert.json_result() == json.dumps(srgb_image_convert.result)
@@ -116,11 +117,11 @@ class TestAviJp2Convert:
         for key in ['success', 'message']:
             assert key in no_icc_image_convert.result.keys()
 
-        assert no_icc_image_convert.success == True
-        assert no_icc_image_convert.result.get('success') == True
+        assert no_icc_image_convert.success is True
+        assert no_icc_image_convert.success == no_icc_image_convert.result.get('success')
 
         assert no_icc_image_convert.result_message == f'Successfully converted and wrote file to {no_icc_destination_file}'
-        assert no_icc_image_convert.result.get('message') == f'Successfully converted and wrote file to {no_icc_destination_file}'
+        assert no_icc_image_convert.result_message == no_icc_image_convert.result.get('message')
 
         assert isinstance(no_icc_image_convert.json_result(), str)
         assert no_icc_image_convert.json_result() == json.dumps(no_icc_image_convert.result)

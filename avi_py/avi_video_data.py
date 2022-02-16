@@ -1,13 +1,18 @@
 import os
 import errno
-import ffmpeg
 
 from pathlib import Path
 from typing import Union, List
 
+import ffmpeg
+
 from . import constants as avi_const
 
 class AviVideoData:
+    """
+    Class for storing all low level video data for functions that are used for
+    creating video deriavtives with FFMpeg
+    """
     def __init__(self, video_src_path: Union[str, Path]) -> None:
         self.video_src_path = video_src_path
         self.ffmpeg_probe = ffmpeg.probe(video_src_path)
@@ -30,7 +35,7 @@ class AviVideoData:
         return self.__ffmpeg_probe
 
     @ffmpeg_probe.setter
-    def ffmpeg_probe(self, ffprobe: dict={}) -> None:
+    def ffmpeg_probe(self, ffprobe: dict) -> None:
         self.__ffmpeg_probe = ffprobe
 
     @property
@@ -66,6 +71,10 @@ class AviVideoData:
         return self.video_ext in avi_const.VALID_VIDEO_EXTENSIONS
 
     def ss_time(self) -> int:
-        return avi_const.FFMPEG_DEFAULT_SS_TIME
+        if 'duration' not in self.ffprobe_format.keys():
+            return avi_const.FFMPEG_DEFAULT_SS_TIME
+        duration = float(self.ffprobe_format['duration'])
+        screenshot_time = round(duration / 2)
+        return int(screenshot_time)
 
 __all__ = ['AviVideoData']

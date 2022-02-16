@@ -6,7 +6,6 @@ import tempfile
 import shutil
 import logging
 import subprocess
-import sys
 import json
 import os
 from pathlib import Path
@@ -73,15 +72,15 @@ class AviJp2Processor:
         self.kakadu = Kakadu(kakadu_base_path=avi_const.KAKADU_BASE_PATH)
         self.converter = AviConverter(exiftool_path=avi_const.EXIFTOOL_PATH, quiet=not avi_const.CONSOLE_DEBUG_MODE)
         self.destination_file = destination_file
-        self.success = True
+        self.success = False
         self.result_message = ''
         self.logger = logging.getLogger('avi_py')
 
     @classmethod
     def process_jp2(cls, input_file_path: Union[str, Path], destination_file: Union[str, Path]) -> AviJp2Processor:
-        jp2_converter = cls(input_file_path, destination_file)
-        jp2_converter.convert_to_jp2()
-        return jp2_converter
+        jp2_processor = cls(input_file_path, destination_file)
+        jp2_processor.convert_to_jp2()
+        return jp2_processor
 
     @property
     def result(self) -> dict:
@@ -112,7 +111,7 @@ class AviJp2Processor:
         self.__destination_file = str(destination_file)
 
     def json_result(self) -> str:
-        return json.dumps(self.result())
+        return json.dumps(self.result)
 
     def convert_to_jp2(self) -> None:
         try:
@@ -134,7 +133,6 @@ class AviJp2Processor:
                     require_icc_profile_for_greyscale=False)
             except ValidationError as v_e:
                 msg = f'ValidationError: {v_e}'
-                self.__set_error_result(msg)
                 raise AviJp2ProcessorError(msg) from v_e
 
             self.logger.debug('image {} is able to be converted to jp2!'.format(input_file))
@@ -150,7 +148,6 @@ class AviJp2Processor:
                 self.kakadu.kdu_compress(input_file, self.destination_file, kakadu_options=kdu_args)
             except (KakaduError, OSError) as kdu_e:
                 msg = f'{kdu_e.__class__.__name__} {kdu_e}'
-                self.__set_error_result(msg)
                 raise AviJp2ProcessorError(msg) from kdu_e
             finally:
                 # Deletes the tmp file created from the convert_icc_profile method.
@@ -160,9 +157,10 @@ class AviJp2Processor:
             self.logger.debug('Successfully converted to jp2!')
             self.__set_success_result()
         except AviJp2ProcessorError as avi_ex:
-            self.logger.error('Error Occured processing file for Jp2 conversion!')
-            self.logger.error('Details: {}'.format(str(avi_ex)))
-            self.logger.error('Check result and logs to see additional details')
+            msg = str(avi_ex)
+            self.__set_error_result(msg)
+            self.logger.error('Error occured processing file for Jp2 conversion!')
+            self.logger.error('Check result and logs for more details.')
 
     def convert_icc_profile(self) -> str:
         try:
@@ -180,7 +178,6 @@ class AviJp2Processor:
             return out_file.name
         except (AssertionError, PyCMSError, ImageProcessingError, IOError) as a_e:
             msg = f'{a_e.__class__.__name__}{a_e}'
-            self.__set_error_result(msg)
             raise AviJp2ProcessorError(msg) from a_e
 
     def __convert_icc_profile_with_magick(self, input_file: str, out_file: str) -> None:
@@ -215,6 +212,7 @@ class AviJp2Processor:
         self.result_message = f'Successfully converted and wrote file to {self.destination_file}'
 
     def __set_error_result(self, error_msg: str='') -> None:
-        self.logger.error(error_msg)
         self.success = False
         self.result_message = error_msg
+
+__all__ = ['AviJp2Processor', 'AviJp2ProcessorError']

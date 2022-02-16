@@ -12,7 +12,7 @@ __DEFAULT_LOG_PATH = str(Path.cwd() / 'logs' / 'avi_convert_jp2.log')
 __JP2_PARSER_DESC = "Generate a JP2 from a TIFF. Adds sRGB_IEC61966-2-1_no_black_scaling icc profile if is color. Prevalidates image before conversion"
 __FFMPEG_THUMB_PARSER_DESC = "Generate a 300x300 pixel thumbnail from a given .mov or .mp4 file"
 
-__all__ = ['convert_jp2_main']
+__all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main']
 
 def convert_jp2_main() -> None:
     """
@@ -69,14 +69,15 @@ def __setup_logger(log_file: str, log_level: str='debug') -> None:
         stream_handler.setFormatter(__LOG_FORMAT)
         root_logger.addHandler(stream_handler)
 
-def __parse_ffmpeg_thumbnail_args(parser: ArgumentParser(prog='avi_ffmpeg_thumbnail', description=__FFMPEG_THUMB_PARSER_DESC)) -> Namespace:
-        parser.add_argument('src_file_path', type=str, help='Full path to the source tiff file to covert')
-        parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
-        parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
-        parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
-        return parser.parse_args()
+def __parse_ffmpeg_thumbnail_args(parser: ArgumentParser=ArgumentParser(prog='avi_ffmpeg_thumbnail',
+                                            description=__FFMPEG_THUMB_PARSER_DESC)) -> Namespace:
+    parser.add_argument('src_file_path', type=str, help='Full path to the source tiff file to covert')
+    parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
+    parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
+    parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
+    return parser.parse_args()
 
-def __parse_jp2_args(parser: ArgumentParser= ArgumentParser(prog='avi_jp2_convert',
+def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert',
                                             description=__JP2_PARSER_DESC)) -> Namespace:
     parser.add_argument('src_file_path', type=str, help='Full path to the source tiff file to covert')
     parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
