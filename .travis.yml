@@ -19,7 +19,6 @@ addons:
       - libtiff5-dev
       - build-essential
       - make
-      - ffmpeg
 
 env:
   global:
@@ -28,6 +27,7 @@ env:
     - MAGICK_MEMORY_LIMIT=512
 
 before_install:
+  - sudo apt-get install -y ffmpeg
   - wget https://www.imagemagick.org/download/ImageMagick.tar.gz
   - tar xzvf ImageMagick.tar.gz
   - cd ImageMagick-7.*
