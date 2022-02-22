@@ -3,19 +3,23 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[scripts]
+avi_convert_jp2 = 'bin/avi_convert_jp2'
+avi_ffmpeg_thumbnail = 'bin/avi_ffmpeg_thumbnail'
+
 [packages]
 opencv-python = ">3.4"
 image-processing = {editable = true, ref = "1.9.1", git = "https://github.com/bodleian/image-processing.git"}
 urllib3 = ">=1.26.5"
 pillow = ">=9.0.0"
-avi-py = {editable = true, path = "."}
+ffmpeg-python = ">=0.2.0"
+numpy = ">=1.21"
 
 [dev-packages]
 pytest = ">=6.2"
-pylint = "~=2.7"
+pylint = "~=2.12"
 coveralls = "~=3.0"
 pytest-cov = "~=2.11"
-pipenv-setup = "~=3.1"
 
 [requires]
 python_version = "3.8"
