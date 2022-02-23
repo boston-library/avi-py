@@ -66,7 +66,7 @@ def __setup_logger(log_file: str, log_level_name: str='debug') -> None:
     file_handler = logging.FileHandler(log_file, mode='a+')
     file_handler.setLevel(log_level)
     file_handler.setFormatter(__LOG_FORMAT)
-    root_logger.add_handler(file_handler)
+    root_logger.addHandler(file_handler)
     if avi_const.CONSOLE_DEBUG_MODE:
         stream_handler = logging.StreamHandler(sys.stderr)
         stream_handler.setLevel(logging.DEBUG)
