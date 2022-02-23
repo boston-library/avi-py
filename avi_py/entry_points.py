@@ -51,11 +51,15 @@ def ffmpeg_thumbnail_main() -> None:
     except FileNotFoundError as f_ex:
         sys.exit("Error! {}".format(str(f_ex)))
 
-def __setup_logger(log_file: str, log_level: str='debug') -> None:
+def __setup_logger(log_file: str, log_level_name: str='debug') -> None:
     """
     Sets up the logger. Writes to console as well a file if AVI_DEBUG=true
     """
 
+    if not log_level_name.isupper():
+        log_level_name = log_level_name.upper()
+
+    log_level = logging.getLevelName(log_level_name)
     root_logger = logging.getLogger(__name__)
     root_logger.setLevel(log_level)
 
@@ -74,7 +78,7 @@ def __parse_ffmpeg_thumbnail_args(parser: ArgumentParser=ArgumentParser(prog='av
     parser.add_argument('src_file_path', type=str, help='Full path to the source mov|mp4 file to covert')
     parser.add_argument('dest_file_path', type=str, help='Path to jpg thumbnail output file')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
-    parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
+    parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='DEBUG')
     return parser.parse_args()
 
 def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert',
