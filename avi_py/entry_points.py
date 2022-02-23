@@ -71,15 +71,15 @@ def __setup_logger(log_file: str, log_level: str='debug') -> None:
 
 def __parse_ffmpeg_thumbnail_args(parser: ArgumentParser=ArgumentParser(prog='avi_ffmpeg_thumbnail',
                                             description=__FFMPEG_THUMB_PARSER_DESC)) -> Namespace:
-    parser.add_argument('src_file_path', type=str, help='Full path to the source tiff file to covert')
-    parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
+    parser.add_argument('src_file_path', type=str, help='Full path to the source mov|mp4 file to covert')
+    parser.add_argument('dest_file_path', type=str, help='Path to jpg thumbnail output file')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
     return parser.parse_args()
 
 def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert',
                                             description=__JP2_PARSER_DESC)) -> Namespace:
-    parser.add_argument('src_file_path', type=str, help='Full path to the source tiff file to covert')
+    parser.add_argument('src_file_path', type=str, help='Full path to the source mov or mp4 file to covert')
     parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
