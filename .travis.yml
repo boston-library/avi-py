@@ -22,6 +22,7 @@ addons:
 
 env:
   global:
+    - PYTHON=3.8.13
     - KAKADU_HOME=/opt/kakadu
     - AVI_DEBUG=true
     - MAGICK_MEMORY_LIMIT=512
@@ -45,10 +46,10 @@ before_install:
   - export LD_LIBRARY_PATH
 
 install:
-  - pip install pipenv --upgrade-strategy=only-if-needed
+  - pip install --upgrade pip
+  - pip install pipenv --upgrade-strategy=eager
   - pipenv install --dev
 script:
   - pylint avi_py/ && pytest --cov=avi_py/
-
 after_success:
   - coveralls
