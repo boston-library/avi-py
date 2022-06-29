@@ -29,7 +29,7 @@ env:
 
 before_install:
   - sudo apt-get install -y ffmpeg
-  - wget https://www.imagemagick.org/download/ImageMagick.tar.gz
+  - wget https://imagemagick.org/archive/ImageMagick.tar.gz
   - tar xzvf ImageMagick.tar.gz
   - cd ImageMagick-7.*
   - ./configure
