@@ -1,5 +1,5 @@
 os: linux
-dist: bionic
+dist: focal
 language: python
 
 python:
@@ -8,6 +8,9 @@ python:
 cache:
   - pip: true
   - apt: true
+
+virtualenv:
+  system_site_packages: true
 
 addons:
   apt:
@@ -47,7 +50,7 @@ before_install:
 
 install:
   - pip install --upgrade pip
-  - pip install pipenv --upgrade-strategy=eager
+  - pip install pipenv
   - pipenv install --dev
 script:
   - pylint avi_py/ && pytest --cov=avi_py/
