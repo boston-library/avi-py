@@ -9,7 +9,7 @@ avi_ffmpeg_thumbnail = 'bin/avi_ffmpeg_thumbnail'
 
 [packages]
 opencv-python = ">3.4"
-image-processing = {editable = true, ref = "1.9.1", git = "https://github.com/bodleian/image-processing.git"}
+image-processing = {editable = true, ref = "1.10.0", git = "https://github.com/bodleian/image-processing.git"}
 urllib3 = ">=1.26.5"
 pillow = ">=9.0.0"
 ffmpeg-python = ">=0.2.0"
@@ -17,7 +17,7 @@ numpy = ">=1.21"
 
 [dev-packages]
 pytest = ">=6.2"
-pylint = "~=2.12"
+pylint = "~=2.14"
 coveralls = "~=3.0"
 pytest-cov = "~=2.11"
 
