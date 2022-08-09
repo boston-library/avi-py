@@ -10,6 +10,7 @@ EXIFTOOL_PATH=os.getenv('EXIFTOOL_PATH', 'exiftool')
 COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
 VALID_VIDEO_EXTENSIONS=['.mov', '.mp4', '.avi']
+VALID_AUDIO_EXTENSIONS=['.wav']
 
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024
@@ -19,6 +20,8 @@ IMAGE_MAX_LEVEL_SIZE=96
 # Get screenshot five seconds into video
 FFMPEG_DEFAULT_SS_TIME=5
 FFMPEG_THUMBNAIL_SIZE=(300, 300)
+
+FFMPEG_AUDIO_ARGS={'ar': '44100', 'ac': 2, 'audio_bitrate': '192k', 'acodec': 'libmp3lame', 'f': 'mp3'}
 
 KAKADU_DEFAULT_OPTIONS=[
     '-num_threads', str(os.cpu_count()),

@@ -11,8 +11,9 @@ __LOG_FORMAT = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelnam
 __DEFAULT_LOG_PATH = str(Path.cwd() / 'logs' / 'avi_convert_jp2.log')
 __JP2_PARSER_DESC = "Generate a JP2 from a TIFF. Adds sRGB_IEC61966-2-1_no_black_scaling icc profile if is color. Prevalidates image before conversion"
 __FFMPEG_THUMB_PARSER_DESC = "Generate a 300x300 pixel thumbnail from a given .mov or .mp4 file"
+__FFMPEG_AUDIO_PARSER_DESC = "Generate a mp3 from a given .wav file"
 
-__all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main']
+__all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main', 'ffmpeg_mp3_main']
 
 def convert_jp2_main() -> None:
     """
@@ -51,6 +52,23 @@ def ffmpeg_thumbnail_main() -> None:
     except FileNotFoundError as f_ex:
         sys.exit("Error! {}".format(str(f_ex)))
 
+def ffmpeg_mp3_main() -> None:
+    """
+    A basic command line script that runs :func:`~avi_py.avi_ffmpeg_processor.AviFFMpegProcessor.process_mp3`"
+    """
+    args = __parse_ffmpeg_mp3_args()
+    __setup_logger(args.log_file, args.log_level)
+
+    try:
+        ffmpeg_thumb = AviFFMpegProcessor.process_mp3(args.src_file_path, args.dest_file_path)
+        json_result = ffmpeg_thumb.json_result()
+        if ffmpeg_thumb.success:
+            print("{}".format(json_result), end='')
+        else:
+            sys.exit("Error! {}".format(json_result))
+    except FileNotFoundError as f_ex:
+        sys.exit("Error! {}".format(str(f_ex)))
+
 def __setup_logger(log_file: str, log_level_name: str='debug') -> None:
     """
     Sets up the logger. Writes to console as well a file if AVI_DEBUG=true
@@ -81,9 +99,17 @@ def __parse_ffmpeg_thumbnail_args(parser: ArgumentParser=ArgumentParser(prog='av
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='DEBUG')
     return parser.parse_args()
 
+def __parse_ffmpeg_mp3_args(parser: ArgumentParser=ArgumentParser(prog='avi_ffmpeg_mp3',
+                                            description=__FFMPEG_AUDIO_PARSER_DESC)) -> Namespace:
+    parser.add_argument('src_file_path', type=str, help='Full path to the source wav file to covert')
+    parser.add_argument('dest_file_path', type=str, help='Path to mp3 thumbnail output file')
+    parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
+    parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='DEBUG')
+    return parser.parse_args()
+
 def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert',
                                             description=__JP2_PARSER_DESC)) -> Namespace:
-    parser.add_argument('src_file_path', type=str, help='Full path to the source mov or mp4 file to covert')
+    parser.add_argument('src_file_path', type=str, help='Full path to the source tif file to covert')
     parser.add_argument('dest_file_path', type=str, help='Path to jp2 output file')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')

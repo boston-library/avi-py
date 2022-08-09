@@ -15,6 +15,8 @@ SRGB_IMAGE=str(TEST_FILE_DIR / 'srgb_image.tiff')
 MP4_VIDEO=str(TEST_FILE_DIR / 'mlk.mp4')
 MOV_VIDEO=str(TEST_FILE_DIR / 'mlk.mov')
 
+WAV_AUDIO=str(TEST_FILE_DIR / 'audio-test.wav')
+
 @contextmanager
 def image_fixture(img_path):
     p = Path(str(img_path))
