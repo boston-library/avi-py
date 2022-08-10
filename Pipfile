@@ -6,6 +6,7 @@ name = "pypi"
 [scripts]
 avi_jp2_convert = 'bin/avi_jp2_convert'
 avi_ffmpeg_thumbnail = 'bin/avi_ffmpeg_thumbnail'
+avi_ffmpeg_mp3 = 'bin/avi_ffmpeg_mp3'
 
 [packages]
 opencv-python = ">3.4"
