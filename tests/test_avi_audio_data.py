@@ -1,29 +1,31 @@
 import logging
-import pytest
-import os
 import sys
 from pathlib import Path
 
-from avi_py.avi_ffprobe_data import AviFfprobeData
+import pytest
+
+from avi_py.avi_ffprobe_data import AviFFProbeData
 from avi_py.avi_audio_data import AviAudioData
-from avi_py import constants as avi_const
 from . import file_fixtures
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 
 def get_audio_data(audio_src_path) -> AviAudioData:
-    return AviAudioData(video_src_path)
+    return AviAudioData(audio_src_path)
 
-@pytest.fixture
-def wav_audio_data() -> AviAudioData:
-    return AviAudioData(file_fixtures.WAV_AUDIO)
+@pytest.fixture(name='wav_audio_data')
+def fixture_wav_audio_data() -> AviAudioData:
+    return get_audio_data(file_fixtures.WAV_AUDIO)
 
 
 class TestAviAudioData:
+    """
+    Unit tests for the AviAudioData class
+    """
     def test_wav_audio_data(self, wav_audio_data):
         assert bool(wav_audio_data) is True
         assert isinstance(wav_audio_data, AviAudioData)
-        assert issubclass(wav_audio_data.__class__, AviFfprobeData)
+        assert issubclass(wav_audio_data.__class__, AviFFProbeData)
         assert isinstance(wav_audio_data.audio_src_path, Path)
 
         assert str(wav_audio_data.audio_src_path) == file_fixtures.WAV_AUDIO

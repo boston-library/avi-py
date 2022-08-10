@@ -1,12 +1,11 @@
 import logging
-import pytest
-import os
 import sys
 from pathlib import Path
 
-from avi_py.avi_ffprobe_data import AviFfprobeData
+import pytest
+
+from avi_py.avi_ffprobe_data import AviFFProbeData
 from avi_py.avi_video_data import AviVideoData
-from avi_py import constants as avi_const
 from . import file_fixtures
 
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
@@ -14,19 +13,22 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 def get_video_data(video_src_path) -> AviVideoData:
     return AviVideoData(video_src_path)
 
-@pytest.fixture
-def mov_video_data() -> AviVideoData:
-    return AviVideoData(file_fixtures.MOV_VIDEO)
+@pytest.fixture(name='mov_video_data')
+def fixture_mov_video_data() -> AviVideoData:
+    return get_video_data(file_fixtures.MOV_VIDEO)
 
-@pytest.fixture
-def mp4_video_data() -> AviVideoData:
-    return AviVideoData(file_fixtures.MP4_VIDEO)
+@pytest.fixture(name='mp4_video_data')
+def fixture_mp4_video_data() -> AviVideoData:
+    return get_video_data(file_fixtures.MP4_VIDEO)
 
-class TestAviImageData:
+class TestAviVideoData:
+    """
+    Unit tests for the AviVideoData class
+    """
     def test_mov_video_data(self, mov_video_data):
         assert bool(mov_video_data) is True
         assert isinstance(mov_video_data, AviVideoData)
-        assert issubclass(mov_video_data.__class__, AviFfprobeData)
+        assert issubclass(mov_video_data.__class__, AviFFProbeData)
         assert isinstance(mov_video_data.video_src_path, Path)
 
         assert str(mov_video_data.video_src_path) == file_fixtures.MOV_VIDEO
@@ -65,10 +67,10 @@ class TestAviImageData:
             assert isinstance(audio_stream, dict)
         assert isinstance(mov_video_data.ss_time(), int)
 
-    def test_mp4_video_datat(self, mp4_video_data):
+    def test_mp4_video_data(self, mp4_video_data):
         assert bool(mp4_video_data) is True
         assert isinstance(mp4_video_data, AviVideoData)
-        assert issubclass(mp4_video_data.__class__, AviFfprobeData)
+        assert issubclass(mp4_video_data.__class__, AviFFProbeData)
         assert isinstance(mp4_video_data.video_src_path, Path)
 
         assert str(mp4_video_data.video_src_path) == file_fixtures.MP4_VIDEO

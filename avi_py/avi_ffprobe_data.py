@@ -1,9 +1,9 @@
-import ffmpeg
-
 from pathlib import Path
 from typing import Union, List
 
-class AviFfprobeData:
+import ffmpeg
+
+class AviFFProbeData:
     """
     Base Class for storing all low level audio/video data for functions that are used for
     creating audio/video deriavtives with ffprobe
@@ -41,4 +41,4 @@ class AviFfprobeData:
     def audio_streams(self) -> List[dict]:
         return [stream for stream in self.ffprobe_streams if stream['codec_type'] == 'audio']
 
-__all__ = ['AviFfprobeData']
+__all__ = ['AviFFProbeData']

@@ -1,8 +1,8 @@
 import logging
-import pytest
-import os
 import sys
 from pathlib import Path
+
+import pytest
 
 from avi_py.avi_image_data import AviImageData
 from avi_py import constants as avi_const
@@ -13,19 +13,22 @@ logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 def get_image_data(image_path: str) -> AviImageData:
     return AviImageData(image_path)
 
-@pytest.fixture
-def grayscaled_image_data() -> AviImageData:
+@pytest.fixture(name='grayscaled_image_data')
+def fixture_grayscaled_image_data() -> AviImageData:
     return get_image_data(file_fixtures.GRAYSCALED_IMAGE)
 
-@pytest.fixture
-def srgb_image_data() -> AviImageData:
+@pytest.fixture(name='srgb_image_data')
+def fixture_srgb_image_data() -> AviImageData:
     return get_image_data(file_fixtures.SRGB_IMAGE)
 
-@pytest.fixture
-def no_icc_profile_image() -> AviImageData:
+@pytest.fixture(name='no_icc_profile_image')
+def fixture_no_icc_profile_image() -> AviImageData:
     return get_image_data(file_fixtures.NO_ICC_IMAGE)
 
 class TestAviImageData:
+    """
+    Unit tests for the AviImageData class
+    """
     def test_grayscaled_image_data(self, grayscaled_image_data):
         assert isinstance(grayscaled_image_data, AviImageData)
 

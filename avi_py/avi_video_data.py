@@ -2,14 +2,12 @@ import os
 import errno
 
 from pathlib import Path
-from typing import Union, List
-
-import ffmpeg
+from typing import Union
 
 from . import constants as avi_const
-from .avi_ffprobe_data import AviFfprobeData
+from .avi_ffprobe_data import AviFFProbeData
 
-class AviVideoData(AviFfprobeData):
+class AviVideoData(AviFFProbeData):
     """
     Class for storing all low level video data for functions that are used for
     creating video deriavtives with FFMpeg

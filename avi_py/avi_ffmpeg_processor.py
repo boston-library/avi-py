@@ -78,7 +78,7 @@ class AviFFMpegProcessor:
         try:
             if self.audio_data is None:
                 raise AviFFMpegProcessorError('Source Audio Data is None. Did you mean to call generate_mp3?')
-            elif not self.audio_data.valid_audio_ext():
+            if not self.audio_data.valid_audio_ext():
                 raise AviFFMpegProcessorError('Source audio is not a .wav')
             self._ffmpeg_mp3()
             self.__set_success_result()
@@ -92,7 +92,7 @@ class AviFFMpegProcessor:
         try:
             if self.video_data is None:
                 raise AviFFMpegProcessorError('Source Video Data is None. Did you mean to call generate_mp3?')
-            elif not self.video_data.valid_video_ext():
+            if not self.video_data.valid_video_ext():
                 raise AviFFMpegProcessorError('Source video is not a .mov or .mp4')
             with tempfile.NamedTemporaryFile(prefix='avi_py-ffmpeg-thumb_', suffix='.jpg') as ffmpeg_jpeg:
                 self._ffmpeg_thumbnail(ffmpeg_jpeg.name)
