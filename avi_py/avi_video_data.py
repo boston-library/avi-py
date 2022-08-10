@@ -2,20 +2,19 @@ import os
 import errno
 
 from pathlib import Path
-from typing import Union, List
-
-import ffmpeg
+from typing import Union
 
 from . import constants as avi_const
+from .avi_ffprobe_data import AviFFProbeData
 
-class AviVideoData:
+class AviVideoData(AviFFProbeData):
     """
     Class for storing all low level video data for functions that are used for
     creating video deriavtives with FFMpeg
     """
     def __init__(self, video_src_path: Union[str, Path]) -> None:
         self.video_src_path = video_src_path
-        self.ffmpeg_probe = ffmpeg.probe(video_src_path)
+        super().__init__(video_src_path)
 
     @property
     def video_src_path(self) -> Path:
@@ -31,37 +30,8 @@ class AviVideoData:
         self.__video_src_path = video_src_path
 
     @property
-    def ffmpeg_probe(self) -> dict:
-        return self.__ffmpeg_probe
-
-    @ffmpeg_probe.setter
-    def ffmpeg_probe(self, ffprobe: dict) -> None:
-        self.__ffmpeg_probe = ffprobe
-
-    @property
-    def ffprobe_streams(self) -> List[dict]:
-        if 'streams' in self.ffmpeg_probe.keys():
-            return self.ffmpeg_probe['streams']
-        return []
-
-    @property
-    def ffprobe_format(self) -> dict:
-        if 'format' in self.ffmpeg_probe.keys():
-            return self.ffmpeg_probe['format']
-        return {}
-
-    @property
     def video_stream(self) -> dict:
         return next((stream for stream in self.ffprobe_streams if stream['codec_type'] == 'video'), {})
-
-    # NOTE: More than one audio channel
-    @property
-    def audio_streams(self) -> List[dict]:
-        return [stream for stream in self.ffprobe_streams if stream['codec_type'] == 'audio']
-
-    @property
-    def raw_stream(self) -> dict:
-        return next((stream for stream in self.ffprobe_streams if stream['codec_type'] == 'data'), {})
 
     @property
     def video_ext(self) -> str:
