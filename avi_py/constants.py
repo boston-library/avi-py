@@ -1,17 +1,22 @@
 import os
 from pathlib import Path
 
+import cv2
+import numpy as np
+
+
 KAKADU_BASE_PATH=os.getenv('KAKADU_HOME', '')
 CONSOLE_DEBUG_MODE=(str(os.getenv('AVI_DEBUG', 'false')).lower() == 'true')
 # NOTE: May not need the source folder path below. But definetley in the avi processor
 PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
 EXIFTOOL_PATH=os.getenv('EXIFTOOL_PATH', 'exiftool')
+GREEN = (0, 255, 0)
 COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
 VALID_VIDEO_EXTENSIONS=['.mov', '.mp4', '.avi']
 VALID_AUDIO_EXTENSIONS=['.wav']
-
+MAX_CONCURRENCY=min(32, os.cpu_count() + 4)
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024
 IMAGE_DEFAULT_COMPRESSION=10
@@ -52,3 +57,7 @@ KAKADU_DEFAULT_RECIPE=[
     'ORGgen_plt=yes',
     'ORGtparts=R',
 ]
+
+TESS_DEFAULT_LANG=r'eng'
+TESS_DEFAULT_CFG=r'--oem 1 --psm 1'
+TESS_OUT_FILE_TYPES={'pdf': 'pdf', 'alto': 'xml'}
