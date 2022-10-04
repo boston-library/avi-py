@@ -10,9 +10,8 @@ from pathlib import Path
 from typing import Union
 from PIL import Image
 import numpy as np
-
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import pytesseract
-
 from . import constants as avi_const
 from .avi_tesseract_image import AviTesseractImage
 
@@ -20,8 +19,10 @@ class AviTesseractProcessorError(Exception):
     pass
 
 class AviTesseractProcessor:
-    def __init__(self, image_src_path: [Union[str, Path]]) -> None:
+    def __init__(self, image_src_path: Union[str, Path], tess_langs: str=avi_const.TESS_DEFAULT_LANG, tess_cfg: str=avi_const.TESS_DEFAULT_CFG) -> None:
         self.image_src_path = image_src_path
+        self.tesseract_langs = tess_langs
+        self.tesseract_config = tess_cfg
         self.success = False
         self.result_message = ''
         self.logger = logging.getLogger('avi_py')
@@ -46,6 +47,25 @@ class AviTesseractProcessor:
         self.__image_src_path = image_src_path
 
     @property
+    def tesseract_langs(self) -> str:
+        return self.__tesseract_langs
+
+    @tesseract_langs.setter
+    def tesseract_langs(self, tess_langs: str) -> None:
+        existing_langs = set(pytesseract.get_languages())
+        langs = set(tess_langs.split('+'))
+        assert langs.issubset(existing_langs)
+        self.__tesseract_langs = tess_langs
+
+    @property
+    def tesseract_config(self) -> str:
+        return self.__tesseract_config
+
+    @tesseract_config.setter
+    def tesseract_config(self, tess_cfg: str) -> None:
+        self.__tesseract_config = tess_cfg
+
+    @property
     def result(self) -> dict:
         return { 'success': self.success, 'message': self.result_message }
 
@@ -54,36 +74,48 @@ class AviTesseractProcessor:
 
     def ocr_for_batch(self) -> None:
         try:
-            self.logger.debug('Generating searchable PDF...')
-            self.__generate_pdf()
-            self.logger.debug('Generating mets/alto...')
-            with AviTesseractImage(self.image_src_path) as pre_processed_img:
-                self.__generate_mets_alto(pre_processed_img)
+            self._generate_ocr_files()
             self.__set_success_result()
         except AviTesseractProcessorError as avi_ex:
             self.logger.error('Error occured processing file for OCR!')
             self.logger.error(f'Reason {avi_ex}')
             self.__set_error_result(str(avi_ex))
 
+    def _generate_ocr_files(self) -> None:
+        with ThreadPoolExecutor(max_workers=2) as ocr_executor:
+            futures = [ocr_executor.submit(self.__generate_pdf), ocr_executor.submit(self.__generate_mets_alto)]
+            try:
+                for future in as_completed(futures):
+                    future.result()
+            except AviTesseractProcessorError as avi_ex:
+                raise avi_ex
+            except Exception as ex:
+                msg = f'Error ocurred during OCR generation! Details: {ex.__class__.__name__}{ex}'
+
     def __generate_pdf(self) -> None:
         try:
-            pdf = pytesseract.image_to_pdf_or_hocr(str(self.image_src_path), extension=avi_const.TESS_OUT_FILE_TYPES['pdf'], lang=avi_const.TESS_DEFAULT_LANG, config=avi_const.TESS_DEFAULT_CFG)
+            self.logger.debug('Generating searchable PDF...')
+            pdf = pytesseract.image_to_pdf_or_hocr(str(self.image_src_path), extension=avi_const.TESS_OUT_FILE_TYPES['pdf'], lang=self.tesseract_langs, config=self.tesseract_config)
             out_file_path = self.__out_file_path(avi_const.TESS_OUT_FILE_TYPES['pdf'])
             self.logger.debug(f'Outputting PDF file at {out_file_path}')
             self.__write_out_file(pdf, out_file_path)
         except Exception as ex:
-            raise AviTesseractProcessorError(f'Error Occured during PDF generation! Reason {ex}')
+            msg = f'Error ocurred during PDF gneration! Details: {ex.__class__.__name__}{ex}'
+            raise AviTesseractProcessorError(msg) from ex
 
-    def __generate_mets_alto(self, pre_processed_img: np.nadarry) -> None:
+    def __generate_mets_alto(self) -> None:
         try:
-            xml = pytesseract.image_to_alto_xml(Image.fromarray(pre_processed_img, mode='L'), lang=avi_const.TESS_DEFAULT_LANG, config=avi_const.TESS_DEFAULT_CFG)
-            out_file_path = self.__out_file_path(avi_const.TESS_OUT_FILE_TYPES['alto'])
-            self.logger.debug(f'Outputting Mets Alto Xml file at {out_file_path}')
-            self.__write_out_file(xml, out_file_path)
+            with AviTesseractImage(self.image_src_path) as pre_processed_img:
+                self.logger.debug('Generating mets/alto...')
+                xml = pytesseract.image_to_alto_xml(Image.fromarray(pre_processed_img, mode='L'), lang=self.tesseract_langs, config=self.tesseract_config)
+                out_file_path = self.__out_file_path(avi_const.TESS_OUT_FILE_TYPES['alto'])
+                self.logger.debug(f'Outputting Mets Alto Xml file at {out_file_path}')
+                self.__write_out_file(xml, out_file_path)
         except Exception as ex:
-            raise AviTesseractProcessorError(f'Error Occured during Mets alto generation! Reason {ex}')
+            msg = f'Error ocurred during Mets alto gneration! Details: {ex.__class__.__name__}{ex}'
+            raise AviTesseractProcessorError(msg) from ex
 
-    def __generate_bbox_data(self, pre_processed_img: np.ndarray) -> None:
+    def __generate_bbox_data(self) -> None:
         # TODO
         pass
 

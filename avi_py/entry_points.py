@@ -6,13 +6,14 @@ from pathlib import Path
 from . import constants as avi_const
 from .avi_jp2_processor import AviJp2Processor
 from .avi_ffmpeg_processor import AviFFMpegProcessor
+from .avi_tesseract_processor import AviTesseractProcessor
 
 __LOG_FORMAT = logging.Formatter("%(asctime)s [%(threadName)-12.12s] [%(levelname)-5.5s]  %(message)s")
-__DEFAULT_LOG_PATH = str(Path.cwd() / 'logs' / 'avi_convert_jp2.log')
+__DEFAULT_LOG_PATH = str(Path.cwd() / 'logs' / 'avi_py.log')
 __JP2_PARSER_DESC = "Generate a JP2 from a TIFF. Adds sRGB_IEC61966-2-1_no_black_scaling icc profile if is color. Prevalidates image before conversion"
 __FFMPEG_THUMB_PARSER_DESC = "Generate a 300x300 pixel thumbnail from a given .mov or .mp4 file"
 __FFMPEG_AUDIO_PARSER_DESC = "Generate a mp3 from a given .wav file"
-
+__OCR_PARSER_DESC = "Generate OCR searchable pdfs and mets alto for a given .tif file"
 __all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main', 'ffmpeg_mp3_main']
 
 def convert_jp2_main() -> None:
@@ -114,3 +115,10 @@ def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
     return parser.parse_args()
+
+def __parse_tesseract_args(parser: ArgumentParser(prog='avi_ocr',
+                                                  description=__OCR_PARSER_DESC)) -> Namespace:
+    parser.add_argument('src_file_path', type=str, help='Full path to source tif file to perform OCR on')
+    parser.add_argument('-Tl', '--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)
+    parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
+    parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
