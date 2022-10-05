@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Union
 from PIL import Image
 import numpy as np
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 import pytesseract
 from . import constants as avi_const
 from .avi_tesseract_image import AviTesseractImage
@@ -18,18 +18,62 @@ from .avi_tesseract_image import AviTesseractImage
 class AviTesseractProcessorError(Exception):
     pass
 
+
+def _out_file_path(image_src_path: Path, out_extension: str) -> Path:
+    basename = image_src_path.stem
+    directory = image_src_path.parent
+    return directory / f'{basename}.{out_extension}'
+
+def _write_out_file(out_file_contents: Union[bytes, str], out_file_path: Path, binary: bool=True) -> None:
+    fmode = 'w+'
+    if binary:
+        fmode = 'w+b'
+    with open(out_file_path, fmode) as out_file:
+        out_file.write(out_file_contents)
+
+def generate_pdf(image_src_path: Union[Path, str], tess_langs: str, tess_cfg: str) -> None:
+    try:
+        pdf = pytesseract.image_to_pdf_or_hocr(str(image_src_path), extension=avi_const.TESS_OUT_FILE_TYPES['pdf'], lang=tess_langs, config=tess_cfg)
+        out_file_path = _out_file_path(image_src_path, avi_const.TESS_OUT_FILE_TYPES['pdf'])
+        _write_out_file(pdf, out_file_path)
+    except Exception as ex:
+        msg = f'Error ocurred during PDF gneration! Details: {ex.__class__.__name__}{ex}'
+        raise AviTesseractProcessorError(msg) from ex
+
+def generate_mets_alto(image_src_path: Path, tess_langs: str, tess_cfg: str) -> None:
+    try:
+        with AviTesseractImage(image_src_path) as pre_processed_img:
+            xml = pytesseract.image_to_alto_xml(Image.fromarray(pre_processed_img, mode='L'), lang=tess_langs, config=tess_cfg)
+            out_file_path = _out_file_path(image_src_path, avi_const.TESS_OUT_FILE_TYPES['alto'])
+            _write_out_file(xml, out_file_path)
+    except Exception as ex:
+        msg = f'Error ocurred during Mets alto gneration! Details: {ex.__class__.__name__}{ex}'
+        raise AviTesseractProcessorError(msg) from ex
+
+def __generate_bbox_data(self) -> None:
+    # TODO
+    pass
+
 class AviTesseractProcessor:
-    def __init__(self, image_src_path: Union[str, Path], tess_langs: str=avi_const.TESS_DEFAULT_LANG, tess_cfg: str=avi_const.TESS_DEFAULT_CFG) -> None:
+    logger = logging.getLogger('avi_py')
+
+    def __init__(self, image_src_path: Union[str, Path],
+                       tess_langs: str=avi_const.TESS_DEFAULT_LANG,
+                       tess_cfg: str=avi_const.TESS_DEFAULT_CFG,
+                       replace_if_exists: bool=False) -> None:
         self.image_src_path = image_src_path
         self.tesseract_langs = tess_langs
         self.tesseract_config = tess_cfg
+        self.replace_if_exists = replace_if_exists
         self.success = False
         self.result_message = ''
-        self.logger = logging.getLogger('avi_py')
 
     @classmethod
-    def process(cls, image_src_path: Union[str, Path]) -> AviTesseractProcessor:
-        tess_processsor = cls(image_src_path)
+    def process_batch_ocr(cls, image_src_path: Union[str, Path],
+                               tess_langs: str=avi_const.TESS_DEFAULT_LANG,
+                               tess_cfg: str=avi_const.TESS_DEFAULT_CFG,
+                               replace_if_exists: bool=False) -> AviTesseractProcessor:
+        tess_processsor = cls(image_src_path, tess_langs, tess_cfg, replace_if_exists)
         tess_processsor.ocr_for_batch()
         return tess_processsor
 
@@ -66,74 +110,72 @@ class AviTesseractProcessor:
         self.__tesseract_config = tess_cfg
 
     @property
+    def replace_if_exists(self) -> bool:
+        return self.__replace_if_exists
+
+    @replace_if_exists.setter
+    def replace_if_exists(self, replace_if_exists: bool) -> None:
+        self.__replace_if_exists = replace_if_exists
+
+    @property
     def result(self) -> dict:
         return { 'success': self.success, 'message': self.result_message }
 
     def json_result(self) -> str:
         return json.dumps(self.result)
 
+    def has_pdf(self) -> bool:
+        expected_pdf_path = self.image_src_path.parent / f'{self.image_src_path.stem}.pdf'
+        return expected_pdf_path.exists()
+
+    def has_mets_alto(self) -> bool:
+        expected_alto_path = self.image_src_path.parent / f'{self.image_src_path.stem}.xml'
+        return expected_alto_path.exists()
+
+    def should_generate_pdf(self) -> bool:
+        if self.replace_if_exists:
+            return True
+        return not self.has_pdf()
+
+    def should_generate_mets_alto(self) -> bool:
+        if self.replace_if_exists:
+            return True
+        return not self.has_mets_alto()
+
     def ocr_for_batch(self) -> None:
         try:
+            if not self.should_generate_pdf() and not self.should_generate_mets_alto():
+                msg = f'OCR files already generated for {self.image_src_path}. Add replace_if_exists = True to replace them'
+                self.__set_success_result(msg)
+                return
             self._generate_ocr_files()
             self.__set_success_result()
         except AviTesseractProcessorError as avi_ex:
-            self.logger.error('Error occured processing file for OCR!')
-            self.logger.error(f'Reason {avi_ex}')
+            self.__class__.logger.error('Error occured processing file for OCR!')
+            self.__class__.logger.error(f'Reason {avi_ex}')
             self.__set_error_result(str(avi_ex))
 
     def _generate_ocr_files(self) -> None:
-        with ThreadPoolExecutor(max_workers=2) as ocr_executor:
-            futures = [ocr_executor.submit(self.__generate_pdf), ocr_executor.submit(self.__generate_mets_alto)]
+        with ProcessPoolExecutor(max_workers=2) as ocr_executor:
             try:
-                for future in as_completed(futures):
-                    future.result()
+                process_list = []
+                if self.should_generate_pdf():
+                    process_list.append(ocr_executor.submit(generate_pdf, self.image_src_path, self.tesseract_langs, self.tesseract_config))
+                if self.should_generate_mets_alto():
+                    process_list.append(ocr_executor.submit(generate_mets_alto, self.image_src_path, self.tesseract_langs, self.tesseract_config))
+                for process in as_completed(process_list):
+                    process.result()
             except AviTesseractProcessorError as avi_ex:
                 raise avi_ex
             except Exception as ex:
                 msg = f'Error ocurred during OCR generation! Details: {ex.__class__.__name__}{ex}'
+                raise AviTesseractProcessorError(msg) from ex
 
-    def __generate_pdf(self) -> None:
-        try:
-            self.logger.debug('Generating searchable PDF...')
-            pdf = pytesseract.image_to_pdf_or_hocr(str(self.image_src_path), extension=avi_const.TESS_OUT_FILE_TYPES['pdf'], lang=self.tesseract_langs, config=self.tesseract_config)
-            out_file_path = self.__out_file_path(avi_const.TESS_OUT_FILE_TYPES['pdf'])
-            self.logger.debug(f'Outputting PDF file at {out_file_path}')
-            self.__write_out_file(pdf, out_file_path)
-        except Exception as ex:
-            msg = f'Error ocurred during PDF gneration! Details: {ex.__class__.__name__}{ex}'
-            raise AviTesseractProcessorError(msg) from ex
-
-    def __generate_mets_alto(self) -> None:
-        try:
-            with AviTesseractImage(self.image_src_path) as pre_processed_img:
-                self.logger.debug('Generating mets/alto...')
-                xml = pytesseract.image_to_alto_xml(Image.fromarray(pre_processed_img, mode='L'), lang=self.tesseract_langs, config=self.tesseract_config)
-                out_file_path = self.__out_file_path(avi_const.TESS_OUT_FILE_TYPES['alto'])
-                self.logger.debug(f'Outputting Mets Alto Xml file at {out_file_path}')
-                self.__write_out_file(xml, out_file_path)
-        except Exception as ex:
-            msg = f'Error ocurred during Mets alto gneration! Details: {ex.__class__.__name__}{ex}'
-            raise AviTesseractProcessorError(msg) from ex
-
-    def __generate_bbox_data(self) -> None:
-        # TODO
-        pass
-
-    def __out_file_path(self, out_extension: str) -> Path:
-        basename = self.image_src_path.stem
-        directory = self.image_src_path.parent
-        return directory / f'{basename}.{out_extension}'
-
-    def __write_out_file(self, out_file_contents: Union[bytes, str], out_file_path: Path, binary: bool=True) -> None:
-        fmode = 'w+'
-        if binary:
-            fmode = 'w+b'
-        with open(out_file_path, fmode) as out_file:
-            out_file.write(out_file_contents)
-
-    def __set_success_result(self) -> None:
+    def __set_success_result(self, msg: str=None) -> None:
+        if msg is None:
+            msg = f'Successfully created OCR pdf/xml files at {self.image_src_path.parent}'
         self.success = True
-        self.result_message = f'Successfully created OCR pdf/xml files at {self.image_src_path.parent}'
+        self.result_message = msg
 
     def __set_error_result(self, error_msg: str='') -> None:
         self.success = False

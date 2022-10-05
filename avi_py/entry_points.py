@@ -70,6 +70,13 @@ def ffmpeg_mp3_main() -> None:
     except FileNotFoundError as f_ex:
         sys.exit("Error! {}".format(str(f_ex)))
 
+
+def avi_tesserct_ocr() -> None:
+    """
+    A basic command line script that runs :func:`~avi_py.avi_tesseract_processor.AviTesseractProcessor.process_thumbnail`"
+    """
+
+
 def __setup_logger(log_file: str, log_level_name: str='debug') -> None:
     """
     Sets up the logger. Writes to console as well a file if AVI_DEBUG=true
@@ -120,5 +127,6 @@ def __parse_tesseract_args(parser: ArgumentParser(prog='avi_ocr',
                                                   description=__OCR_PARSER_DESC)) -> Namespace:
     parser.add_argument('src_file_path', type=str, help='Full path to source tif file to perform OCR on')
     parser.add_argument('-Tl', '--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)
+    parser.add_argument('-Tc', '--tess_cfg', type=str, help='Tesseract configuration options', required= False, default=avi_const.TESS_DEFAULT_CFG)
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')

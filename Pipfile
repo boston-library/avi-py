@@ -16,6 +16,7 @@ pillow = ">=9.0.0"
 ffmpeg-python = ">=0.2.0"
 numpy = ">=1.21"
 pytesseract = "~=0.3"
+dill = "~=0.3"
 
 [dev-packages]
 pytest = ">=6.2"
