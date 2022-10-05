@@ -14,7 +14,7 @@ __JP2_PARSER_DESC = "Generate a JP2 from a TIFF. Adds sRGB_IEC61966-2-1_no_black
 __FFMPEG_THUMB_PARSER_DESC = "Generate a 300x300 pixel thumbnail from a given .mov or .mp4 file"
 __FFMPEG_AUDIO_PARSER_DESC = "Generate a mp3 from a given .wav file"
 __OCR_PARSER_DESC = "Generate OCR searchable pdfs and mets alto for a given .tif file"
-__all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main', 'ffmpeg_mp3_main']
+__all__ = ['convert_jp2_main', 'ffmpeg_thumbnail_main', 'ffmpeg_mp3_main', 'tesseract_ocr_main']
 
 def convert_jp2_main() -> None:
     """
@@ -71,11 +71,21 @@ def ffmpeg_mp3_main() -> None:
         sys.exit("Error! {}".format(str(f_ex)))
 
 
-def avi_tesserct_ocr() -> None:
+def tesseract_ocr_main() -> None:
     """
     A basic command line script that runs :func:`~avi_py.avi_tesseract_processor.AviTesseractProcessor.process_thumbnail`"
     """
-
+    args = __parse_tesseract_args()
+    __setup_logger(args.log_file, args.log_level)
+    try:
+        tesseract_process = AviTesseractProcessor.process_batch_ocr(args.src_file_path, args.tess_langs, args.tess_cfg, args.replace_if_exists)
+        json_result = tesseract_process.json_result()
+        if tesseract_process.success:
+            print("{}".format(json_result), end='')
+        else:
+            sys.exit("Error! {}".format(json_result))
+    except (FileNotFoundError, AssertionError) as ex:
+        sys.exit("Error! {}".format(str(ex)))
 
 def __setup_logger(log_file: str, log_level_name: str='debug') -> None:
     """
@@ -126,7 +136,10 @@ def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert
 def __parse_tesseract_args(parser: ArgumentParser(prog='avi_ocr',
                                                   description=__OCR_PARSER_DESC)) -> Namespace:
     parser.add_argument('src_file_path', type=str, help='Full path to source tif file to perform OCR on')
-    parser.add_argument('-Tl', '--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)
-    parser.add_argument('-Tc', '--tess_cfg', type=str, help='Tesseract configuration options', required= False, default=avi_const.TESS_DEFAULT_CFG)
+    parser.add_argument('--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)
+    parser.add_argument('--tess_cfg', type=str, help='Tesseract configuration options', required= False, default=avi_const.TESS_DEFAULT_CFG)
+    parser.add_argument('--replace-if-exists', dest='replace_if_exists', action='store_true', help='Replace ocr files for image if they exist')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
+    parser.set_defaults(replace_if_exists=False)
+    return parser.parse_args()

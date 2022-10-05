@@ -88,6 +88,7 @@ class AviTesseractProcessor:
         if not image_src_path.exists() or not image_src_path.is_file():
             raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), str(image_src_path))
+        assert image_src_path.suffix == '.tif', f'source image: {image_src_path} is not a .tif file!'
         self.__image_src_path = image_src_path
 
     @property
@@ -98,7 +99,7 @@ class AviTesseractProcessor:
     def tesseract_langs(self, tess_langs: str) -> None:
         existing_langs = set(pytesseract.get_languages())
         langs = set(tess_langs.split('+'))
-        assert langs.issubset(existing_langs)
+        assert langs.issubset(existing_langs), f'{tess_langs} are not valid tesseract languages'
         self.__tesseract_langs = tess_langs
 
     @property
