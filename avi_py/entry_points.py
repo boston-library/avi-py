@@ -133,7 +133,7 @@ def __parse_jp2_args(parser: ArgumentParser=ArgumentParser(prog='avi_jp2_convert
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
     return parser.parse_args()
 
-def __parse_tesseract_args(parser: ArgumentParser(prog='avi_ocr',
+def __parse_tesseract_args(parser: ArgumentParser=ArgumentParser(prog='avi_ocr',
                                                   description=__OCR_PARSER_DESC)) -> Namespace:
     parser.add_argument('src_file_path', type=str, help='Full path to source tif file to perform OCR on')
     parser.add_argument('--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)

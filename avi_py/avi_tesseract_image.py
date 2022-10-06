@@ -2,15 +2,13 @@ import os
 import errno
 from tempfile import TemporaryDirectory, NamedTemporaryFile
 from pathlib import Path
-from typing import Union, List
+from typing import Union
 
 from PIL import Image
 import cv2
 import numpy as np
 
-from . import constants as avi_const
-
-class AviTesseractImage(object):
+class AviTesseractImage:
     """
     Class for pre processing and splitting up tiffs for tesseract OCR
     """

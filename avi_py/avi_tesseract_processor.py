@@ -8,9 +8,8 @@ import logging
 import json
 from pathlib import Path
 from typing import Union
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from PIL import Image
-import numpy as np
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 import pytesseract
 from . import constants as avi_const
 from .avi_tesseract_image import AviTesseractImage
@@ -40,7 +39,7 @@ def generate_pdf(image_src_path: Union[Path, str], tess_langs: str, tess_cfg: st
         msg = f'Error ocurred during PDF gneration! Details: {ex.__class__.__name__}{ex}'
         raise AviTesseractProcessorError(msg) from ex
 
-def generate_mets_alto(image_src_path: Path, tess_langs: str, tess_cfg: str) -> None:
+def generate_mets_alto(image_src_path: Union[Path, str], tess_langs: str, tess_cfg: str) -> None:
     try:
         with AviTesseractImage(image_src_path) as pre_processed_img:
             xml = pytesseract.image_to_alto_xml(Image.fromarray(pre_processed_img, mode='L'), lang=tess_langs, config=tess_cfg)
@@ -50,9 +49,9 @@ def generate_mets_alto(image_src_path: Path, tess_langs: str, tess_cfg: str) -> 
         msg = f'Error ocurred during Mets alto gneration! Details: {ex.__class__.__name__}{ex}'
         raise AviTesseractProcessorError(msg) from ex
 
-def __generate_bbox_data(self) -> None:
-    # TODO
-    pass
+# TODO
+# def generate_bbox_data(image_src_path: Path, tess_langs: str, tess_cfg: str) -> None:
+#     pass
 
 class AviTesseractProcessor:
     logger = logging.getLogger('avi_py')
