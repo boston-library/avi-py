@@ -14,8 +14,9 @@ class AviTesseractImage:
     """
     def __init__(self, image_src_path: Union[str, Path]) -> None:
         self.image_src_path = image_src_path
+        #pylint: disable=consider-using-with
         self._temp_directory = TemporaryDirectory(prefix='avi_tess_image', dir='/tmp')
-
+        #pylint: enable=consider-using-with
     def __enter__(self):
         return self.preprocess_image()
 
@@ -42,7 +43,9 @@ class AviTesseractImage:
         return preprocessed_image
 
     def __ensure_grayscaled(self) -> str:
+        #pylint: disable=consider-using-with
         temp_file = NamedTemporaryFile(delete=False, suffix='.tif', dir=self._temp_directory.name)
+        #pylint: enable=consider-using-with
         with Image.open(self.image_src_path) as img:
             img.convert('L')
             img.save(temp_file.name)

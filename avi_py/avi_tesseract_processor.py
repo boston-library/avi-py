@@ -14,22 +14,24 @@ import pytesseract
 from . import constants as avi_const
 from .avi_tesseract_image import AviTesseractImage
 
+#pylint: disable=missing-class-docstring
 class AviTesseractProcessorError(Exception):
     pass
-
+#pylint: enable=missing-class-docstring
 
 def _out_file_path(image_src_path: Path, out_extension: str) -> Path:
     basename = image_src_path.stem
     directory = image_src_path.parent
     return directory / f'{basename}.{out_extension}'
 
+#pylint: disable=unspecified-encoding
 def _write_out_file(out_file_contents: Union[bytes, str], out_file_path: Path, binary: bool=True) -> None:
     fmode = 'w+'
     if binary:
         fmode = 'w+b'
     with open(out_file_path, fmode) as out_file:
         out_file.write(out_file_contents)
-
+#pylint: enable=unspecified-encoding
 def generate_pdf(image_src_path: Union[Path, str], tess_langs: str, tess_cfg: str) -> None:
     try:
         pdf = pytesseract.image_to_pdf_or_hocr(str(image_src_path), extension=avi_const.TESS_OUT_FILE_TYPES['pdf'], lang=tess_langs, config=tess_cfg)
@@ -49,11 +51,13 @@ def generate_mets_alto(image_src_path: Union[Path, str], tess_langs: str, tess_c
         msg = f'Error ocurred during Mets alto gneration! Details: {ex.__class__.__name__}{ex}'
         raise AviTesseractProcessorError(msg) from ex
 
-# TODO
 # def generate_bbox_data(image_src_path: Path, tess_langs: str, tess_cfg: str) -> None:
 #     pass
 
 class AviTesseractProcessor:
+    """
+    Class that checks and converts a source tiff file and generates a PDF and Mets Alto using tesseract OCR
+    """
     logger = logging.getLogger('avi_py')
 
     def __init__(self, image_src_path: Union[str, Path],
@@ -152,11 +156,11 @@ class AviTesseractProcessor:
             self.__set_success_result()
         except AviTesseractProcessorError as avi_ex:
             self.__class__.logger.error('Error occured processing file for OCR!')
-            self.__class__.logger.error(f'Reason {avi_ex}')
+            self.__class__.logger.error("Reason {0}".format(avi_ex))
             self.__set_error_result(str(avi_ex))
 
     def _generate_ocr_files(self) -> None:
-        with ProcessPoolExecutor(max_workers=2) as ocr_executor:
+        with ProcessPoolExecutor(max_workers=avi_const.TESS_MAX_PROCESSES) as ocr_executor:
             try:
                 process_list = []
                 if self.should_generate_pdf():

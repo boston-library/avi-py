@@ -53,6 +53,7 @@ KAKADU_DEFAULT_RECIPE=[
     'ORGtparts=R',
 ]
 
+TESS_MAX_PROCESSES=min(2, os.cpu_count())
 TESS_DEFAULT_LANG=r'osd+eng'
 TESS_DEFAULT_CFG=r'--oem 1 --psm 1 --dpi 300'
 TESS_OUT_FILE_TYPES={'pdf': 'pdf', 'alto': 'xml'}
