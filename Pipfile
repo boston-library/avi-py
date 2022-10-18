@@ -7,6 +7,7 @@ name = "pypi"
 avi_jp2_convert = 'bin/avi_jp2_convert'
 avi_ffmpeg_thumbnail = 'bin/avi_ffmpeg_thumbnail'
 avi_ffmpeg_mp3 = 'bin/avi_ffmpeg_mp3'
+avi_ocr = 'bin/avi_ocr'
 
 [packages]
 opencv-python = ">3.4"
@@ -15,6 +16,8 @@ urllib3 = ">=1.26.5"
 pillow = ">=9.0.0"
 ffmpeg-python = ">=0.2.0"
 numpy = ">=1.21"
+pytesseract = "~=0.3"
+dill = "~=0.3"
 
 [dev-packages]
 pytest = ">=6.2"

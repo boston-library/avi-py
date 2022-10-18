@@ -25,13 +25,13 @@ addons:
 
 env:
   global:
-    - PYTHON=3.8.13
+    - PYTHON=3.8.14
     - KAKADU_HOME=/opt/kakadu
     - AVI_DEBUG=true
     - MAGICK_MEMORY_LIMIT=512
-
+    - OMP_THREAD_LIMIT=1
 before_install:
-  - sudo apt-get install -y ffmpeg
+  - sudo apt-get install -y tesseract-ocr ffmpeg
   - wget https://imagemagick.org/archive/ImageMagick.tar.gz
   - tar xzvf ImageMagick.tar.gz
   - cd ImageMagick-7.*

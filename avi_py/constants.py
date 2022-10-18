@@ -11,7 +11,7 @@ COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
 VALID_VIDEO_EXTENSIONS=['.mov', '.mp4', '.avi']
 VALID_AUDIO_EXTENSIONS=['.wav']
-
+MAX_CONCURRENCY=min(32, os.cpu_count() + 4)
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024
 IMAGE_DEFAULT_COMPRESSION=10
@@ -52,3 +52,8 @@ KAKADU_DEFAULT_RECIPE=[
     'ORGgen_plt=yes',
     'ORGtparts=R',
 ]
+
+TESS_MAX_PROCESSES=min(2, os.cpu_count())
+TESS_DEFAULT_LANG=r'osd+eng'
+TESS_DEFAULT_CFG=r'--oem 1 --psm 1 --dpi 300'
+TESS_OUT_FILE_TYPES={'pdf': 'pdf', 'alto': 'xml'}
