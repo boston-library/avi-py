@@ -20,7 +20,7 @@ pytesseract = "~=0.3"
 dill = "~=0.3"
 
 [dev-packages]
-pytest = ">=6.2"
+pytest = ">=7.2"
 pylint = "~=2.14"
 coveralls = "~=3.0"
 pytest-cov = "~=2.11"
