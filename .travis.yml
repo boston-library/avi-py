@@ -25,7 +25,7 @@ addons:
 
 env:
   global:
-    - PYTHON=3.8.16
+    - PYTHON=3.8.17
     - KAKADU_HOME=/opt/kakadu
     - AVI_DEBUG=true
     - MAGICK_MEMORY_LIMIT=512
