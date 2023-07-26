@@ -107,7 +107,7 @@ class AviFFMpegProcessor:
         try:
             self.__ffmpeg_downscale_screen_grab(out_file_path)
             with Image.open(out_file_path) as ffmpeg_jpg_frame:
-                ffmpeg_jpg_frame.thumbnail(avi_const.FFMPEG_THUMBNAIL_SIZE, Image.LANCZOS)
+                ffmpeg_jpg_frame.thumbnail(avi_const.FFMPEG_THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
                 ffmpeg_jpg_frame.save(self.dest_file_path)
         except ffmpeg.Error as ff_ex:
             msg = 'Ffmpeg Error! {}'.format(ff_ex.stderr.decode())
