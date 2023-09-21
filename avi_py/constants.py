@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 KAKADU_BASE_PATH=os.getenv('KAKADU_HOME', '')
-CONSOLE_DEBUG_MODE=(str(os.getenv('AVI_DEBUG', 'false')).lower() == 'true')
+CONSOLE_DEBUG_MODE=str(os.getenv('AVI_DEBUG', 'false')).lower() == 'true'
 # NOTE: May not need the source folder path below. But definetley in the avi processor
 PROJECT_ROOT=Path(__file__).parent.parent
 ICC_PROFILE_PATH=PROJECT_ROOT / 'color_profiles' / 'sRGB_IEC61966-2-1_no_black_scaling.icc'
