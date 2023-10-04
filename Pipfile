@@ -12,8 +12,8 @@ avi_ocr = 'bin/avi_ocr'
 [packages]
 opencv-python = ">3.4"
 image-processing = {editable = true, ref = "1.10.0", git = "https://github.com/bodleian/image-processing.git"}
-urllib3 = ">=1.26.5"
-pillow = ">=9.3.0"
+urllib3 = ">=2.0.6"
+pillow = "~=10.0.1"
 ffmpeg-python = ">=0.2.0"
 numpy = ">=1.23"
 pytesseract = "~=0.3"
