@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b624df61959bf7ab1fc5e35aeeb48aa9d814ba930c68168057324cf0e2ea4a49"
+            "sha256": "e4941da596942c7d69306bf480db0799f4deab3b6f91bb856497102391a50fe6"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -42,9 +42,9 @@
         },
         "image-processing": {
             "editable": true,
-            "git": "https://github.com/bodleian/image-processing.git",
+            "git": "git+https://github.com/bodleian/image-processing.git",
             "markers": "python_version >= '3.5'",
-            "ref": "dc4364a6938d2eaf34efbbdbc1b662cae596a81f"
+            "ref": "b697d84f3eecf175e0f8bdac6efdf55b578244ce"
         },
         "jpylyzer": {
             "hashes": [
