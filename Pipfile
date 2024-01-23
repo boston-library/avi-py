@@ -12,7 +12,7 @@ avi_ocr = 'bin/avi_ocr'
 [packages]
 opencv-python = ">3.4"
 urllib3 = ">=2.0.7"
-pillow = "~=10.0.1"
+pillow = "~=10.2.0"
 ffmpeg-python = ">=0.2.0"
 numpy = ">=1.23"
 pytesseract = "~=0.3"
