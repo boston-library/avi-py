@@ -1,16 +1,12 @@
-os: linux
-dist: focal
+dist: jammy
 language: python
 
 python:
-  - "3.8"
+  - "3.9"
 
 cache:
   - pip: true
   - apt: true
-
-virtualenv:
-  system_site_packages: true
 
 addons:
   apt:
@@ -25,7 +21,7 @@ addons:
 
 env:
   global:
-    - PYTHON=3.8.17
+    - PYTHON=3.9.19
     - KAKADU_HOME=/opt/kakadu
     - AVI_DEBUG=true
     - MAGICK_MEMORY_LIMIT=512
