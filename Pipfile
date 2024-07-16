@@ -11,13 +11,14 @@ avi_ocr = 'bin/avi_ocr'
 
 [packages]
 opencv-python = ">3.4"
-urllib3 = ">=2.0.7"
+urllib3 = ">=2.2.2"
 pillow = "~=10.3.0"
 ffmpeg-python = ">=0.2.0"
 numpy = ">=1.23"
 pytesseract = "~=0.3"
 dill = "~=0.3"
 image-processing = {editable = true, ref = "1.12.0", git = "git+https://github.com/bodleian/image-processing.git"}
+requests = ">=2.32.0"
 
 [dev-packages]
 pytest = ">=7.2"
