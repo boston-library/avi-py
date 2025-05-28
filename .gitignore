@@ -25,3 +25,7 @@ build/
 #logs
 logs/*
 !/logs/.keep
+
+
+# pycharm
+.idea/
