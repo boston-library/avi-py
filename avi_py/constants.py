@@ -37,7 +37,7 @@ if CONSOLE_DEBUG_MODE:
     ]
 else:
     MAGICK_DEFAULT_CONVERT_COMMANDS=[
-        'convert',
+        'magick',
         '-quiet',
         '-compress',
         'none'
