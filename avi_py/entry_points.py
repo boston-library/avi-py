@@ -78,7 +78,7 @@ def tesseract_ocr_main() -> None:
     args = __parse_tesseract_args()
     __setup_logger(args.log_file, args.log_level)
     try:
-        tesseract_process = AviTesseractProcessor.process_batch_ocr(args.src_file_path, args.tess_langs, args.tess_cfg, args.replace_if_exists)
+        tesseract_process = AviTesseractProcessor.process_batch_ocr(args.src_file_path, args.tess_langs, args.tess_cfg, args.replace_if_exists, args.generate_searchable_pdf)
         json_result = tesseract_process.json_result()
         if tesseract_process.success:
             print("{}".format(json_result), end='')
@@ -139,7 +139,8 @@ def __parse_tesseract_args(parser: ArgumentParser=ArgumentParser(prog='avi_ocr',
     parser.add_argument('--tess_langs', type=str, help='Tesseract languages to use. Note use multiple with +. (eg, eng+fra)', required=False, default=avi_const.TESS_DEFAULT_LANG)
     parser.add_argument('--tess_cfg', type=str, help='Tesseract configuration options', required= False, default=avi_const.TESS_DEFAULT_CFG)
     parser.add_argument('--replace-if-exists', dest='replace_if_exists', action='store_true', help='Replace ocr files for image if they exist')
+    parser.add_argument('--no-pdf', dest='generate_searchable_pdf', action='store_false', help='Skip pdf generation')
     parser.add_argument('-Lf', '--log_file', type=str, help='Path to a log file to output', required=False, default=__DEFAULT_LOG_PATH)
     parser.add_argument('-Ll', '--log_level', type=str, help='Log level[debug|info|warning|error|critical]', required=False, default='debug')
-    parser.set_defaults(replace_if_exists=False)
+    parser.set_defaults(replace_if_exists=False, generate_searchable_pdf=True)
     return parser.parse_args()
