@@ -63,11 +63,13 @@ class AviTesseractProcessor:
     def __init__(self, image_src_path: Union[str, Path],
                        tess_langs: str=avi_const.TESS_DEFAULT_LANG,
                        tess_cfg: str=avi_const.TESS_DEFAULT_CFG,
-                       replace_if_exists: bool=False) -> None:
+                       replace_if_exists: bool=False,
+                       generate_searchable_pdf: bool=True) -> None:
         self.image_src_path = image_src_path
         self.tesseract_langs = tess_langs
         self.tesseract_config = tess_cfg
         self.replace_if_exists = replace_if_exists
+        self.generate_searchable_pdf = generate_searchable_pdf
         self.success = False
         self.result_message = ''
 
@@ -75,10 +77,11 @@ class AviTesseractProcessor:
     def process_batch_ocr(cls, image_src_path: Union[str, Path],
                                tess_langs: str=avi_const.TESS_DEFAULT_LANG,
                                tess_cfg: str=avi_const.TESS_DEFAULT_CFG,
-                               replace_if_exists: bool=False) -> AviTesseractProcessor:
-        tess_processsor = cls(image_src_path, tess_langs, tess_cfg, replace_if_exists)
-        tess_processsor.ocr_for_batch()
-        return tess_processsor
+                               replace_if_exists: bool=False,
+                               generate_searchable_pdf: bool=True) -> AviTesseractProcessor:
+        tess_processor = cls(image_src_path, tess_langs, tess_cfg, replace_if_exists, generate_searchable_pdf)
+        tess_processor.ocr_for_batch()
+        return tess_processor
 
     @property
     def image_src_path(self) -> Path:
@@ -122,6 +125,14 @@ class AviTesseractProcessor:
         self.__replace_if_exists = replace_if_exists
 
     @property
+    def generate_searchable_pdf(self) -> bool:
+        return self.__generate_searchable_pdf
+
+    @generate_searchable_pdf.setter
+    def generate_searchable_pdf(self, generate_searchable_pdf: bool) -> None:
+        self.__generate_searchable_pdf = generate_searchable_pdf
+
+    @property
     def result(self) -> dict:
         return { 'success': self.success, 'message': self.result_message }
 
@@ -137,6 +148,8 @@ class AviTesseractProcessor:
         return expected_alto_path.exists()
 
     def should_generate_pdf(self) -> bool:
+        if not self.generate_searchable_pdf:
+            return False
         if self.replace_if_exists:
             return True
         return not self.has_pdf()
