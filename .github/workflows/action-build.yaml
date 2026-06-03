@@ -50,9 +50,14 @@ jobs:
           sudo make install
           sudo ldconfig /usr/local/lib
 
+      ## wget https://kakadusoftware.com/wp-content/uploads/KDU841_Demo_Apps_for_Linux-x86-64_231117.zip
+      ## Error: 415 Unsupported Media Type
       - name: Install Kakadu
         run: |
-          wget https://kakadusoftware.com/wp-content/uploads/KDU841_Demo_Apps_for_Linux-x86-64_231117.zip
+          wget \
+            --user-agent="Mozilla/5.0" \
+            -O KDU841_Demo_Apps_for_Linux-x86-64_231117.zip \
+            "https://kakadusoftware.com/wp-content/uploads/KDU841_Demo_Apps_for_Linux-x86-64_231117.zip"
           unzip KDU841_Demo_Apps_for_Linux-x86-64_231117.zip
           sudo mv KDU841_Demo_Apps_for_Linux-x86-64_231117 $KAKADU_HOME
           echo "$KAKADU_HOME" >> $GITHUB_PATH
