@@ -73,11 +73,11 @@ jobs:
           echo "$KAKADU_HOME" >> $GITHUB_PATH
           echo "LD_LIBRARY_PATH=${{ env.KAKADU_HOME }}:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
-      # - name: Install Python dependencies
-      #   run: |
-      #     pip install --upgrade pip
-      #     pip install pipenv
-      #     pipenv install --dev
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev
 
       # - name: Lint with pylint
       #   run: pipenv run pylint avi_py/
