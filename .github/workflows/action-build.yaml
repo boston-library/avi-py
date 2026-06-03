@@ -38,7 +38,9 @@ jobs:
             build-essential \
             make \
             tesseract-ocr \
-            ffmpeg
+            ffmpeg \
+            libtiff-dev \
+            libtiff6
 
       - name: Build and install ImageMagick from source
         run: |
