@@ -1,22 +1,77 @@
 name: CI
- 
+
 on:
   push:
     branches: ["*"]
   pull_request:
     branches: ["*"]
- 
+
 env:
   PYTHON: "3.10.20"
   KAKADU_HOME: /opt/kakadu
   AVI_DEBUG: "true"
   MAGICK_MEMORY_LIMIT: "512"
   OMP_THREAD_LIMIT: "1"
- 
+
 jobs:
   build:
     runs-on: ubuntu-22.04
- 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - name: Cache apt packages
+        uses: awalber/cache-apt-pkgs-action@latest
+        with:
+          packages: >-
+            unzip
+            exiftool
+            libstdc++6
+            libtiff5-dev
+            build-essential
+            make
+            tesseract-ocr
+            ffmpeg
+
+      - name: Build and install ImageMagick from source
+        run: |
+          wget https://imagemagick.org/archive/ImageMagick.tar.gz
+          tar xzvf ImageMagick.tar.gz
+          cd ImageMagick-7.*
+          ./configure
+          make
+          sudo make install
+          sudo ldconfig /usr/local/lib
+
+      - name: Install Kakadu
+        run: |
+          wget http://kakadusoftware.com/wp-content/uploads/KDU841_Demo_Apps_for_Linux-x86-64_231117.zip
+          unzip KDU841_Demo_Apps_for_Linux-x86-64_231117.zip
+          sudo mv KDU841_Demo_Apps_for_Linux-x86-64_231117 $KAKADU_HOME
+          echo "$KAKADU_HOME" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=${{ env.KAKADU_HOME }}:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+
+      - name: Install Python dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pipenv
+          pipenv install --dev
+
+      - name: Lint with pylint
+        run: pipenv run pylint avi_py/
+
+      - name: Run tests with coverage
+        run: pipenv run pytest --cov=avi_py/
+
+      - name: Upload coverage to Coveralls
+        if: success()
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
