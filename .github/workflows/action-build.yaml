@@ -27,19 +27,6 @@ jobs:
           python-version: "3.10"
           # cache: pip
 
-      # - name: Cache apt packages
-      #   uses: awalber/cache-apt-pkgs-action@latest
-      #   with:
-      #     packages: >-
-      #       unzip
-      #       exiftool
-      #       libstdc++6
-      #       libtiff5-dev
-      #       build-essential
-      #       make
-      #       tesseract-ocr
-      #       ffmpeg
-
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -52,8 +39,6 @@ jobs:
             make \
             tesseract-ocr \
             ffmpeg
-
-      
 
       - name: Build and install ImageMagick from source
         run: |
@@ -79,11 +64,11 @@ jobs:
           pip install pipenv
           pipenv install --dev
 
-      # - name: Lint with pylint
-      #   run: pipenv run pylint avi_py/
+      - name: Lint with pylint
+        run: pipenv run pylint avi_py/
 
-      # - name: Run tests with coverage
-      #   run: pipenv run pytest --cov=avi_py/
+      - name: Run tests with coverage
+        run: pipenv run pytest --cov=avi_py/
 
       # - name: Upload coverage to Coveralls
       #   if: success()
