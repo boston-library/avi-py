@@ -39,8 +39,7 @@ jobs:
             make \
             tesseract-ocr \
             ffmpeg \
-            libtiff-dev \
-            libtiff6
+            libtiff-dev
 
       - name: Build and install ImageMagick from source
         run: |
