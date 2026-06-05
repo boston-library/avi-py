@@ -33,7 +33,7 @@ jobs:
             libtiff5-dev \
             build-essential \
             make \
-            tesseract-ocr \
+            tesseract-ocr \\
             ffmpeg
 
       - name: Build and install ImageMagick from source
