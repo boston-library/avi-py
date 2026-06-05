@@ -68,23 +68,3 @@ jobs:
 
       - name: Run tests with coverage
         run: pipenv run pytest --cov=avi_py/
-
-      - name: Send email
-        if: failure()
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 465
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          subject: GitHub Action Failed
-          to: rmiao@bpl.org
-          from: github-actions@example.com
-          body: |
-            Workflow failed.
-
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-
-            Run URL:
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
