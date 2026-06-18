@@ -15,7 +15,7 @@ OCR_IMAGE=str(TEST_FILE_DIR / 'image_for_ocr.tif')
 
 MP4_VIDEO=str(TEST_FILE_DIR / 'mlk.mp4')
 MOV_VIDEO=str(TEST_FILE_DIR / 'mlk.mov')
-
+MKV_VIDEO=str(TEST_FILE_DIR / 'mlk.mkv')
 WAV_AUDIO=str(TEST_FILE_DIR / 'audio-test.wav')
 
 @contextmanager

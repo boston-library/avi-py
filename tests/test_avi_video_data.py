@@ -21,6 +21,10 @@ def fixture_mov_video_data() -> AviVideoData:
 def fixture_mp4_video_data() -> AviVideoData:
     return get_video_data(file_fixtures.MP4_VIDEO)
 
+@pytest.fixture(name='mkv_video_data')
+def fixture_mkv_video_data() -> AviVideoData:
+    return get_video_data(file_fixtures.MKV_VIDEO)
+
 class TestAviVideoData:
     """
     Unit tests for the AviVideoData class
@@ -108,3 +112,44 @@ class TestAviVideoData:
             assert bool(audio_stream) is True
             assert isinstance(audio_stream, dict)
         assert isinstance(mp4_video_data.ss_time(), int)
+
+    def test_mkv_video_data(self, mkv_video_data):
+        assert bool(mkv_video_data) is True
+        assert isinstance(mkv_video_data, AviVideoData)
+        assert issubclass(mkv_video_data.__class__, AviFFProbeData)
+        assert isinstance(mkv_video_data.video_src_path, Path)
+
+        assert str(mkv_video_data.video_src_path) == file_fixtures.MKV_VIDEO
+
+        assert isinstance(mkv_video_data.video_ext, str)
+        assert mkv_video_data.video_ext == '.mkv'
+        assert mkv_video_data.valid_video_ext() is True
+
+        assert bool(mkv_video_data.ffmpeg_probe) is True
+        assert isinstance(mkv_video_data.ffmpeg_probe, dict)
+
+        for key in ['format', 'streams']:
+            assert key in mkv_video_data.ffmpeg_probe.keys()
+
+        assert bool(mkv_video_data.ffprobe_format) is True
+        assert isinstance(mkv_video_data.ffprobe_format, dict)
+
+        assert bool(mkv_video_data.ffprobe_streams) is True
+        assert isinstance(mkv_video_data.ffprobe_streams, list)
+
+        for stream in mkv_video_data.ffprobe_streams:
+            assert bool(stream) is True
+            assert isinstance(stream, dict)
+
+        assert bool(mkv_video_data.video_stream) is True
+        assert isinstance(mkv_video_data.video_stream, dict)
+
+        assert bool(mkv_video_data.audio_streams) is True
+        assert isinstance(mkv_video_data.audio_streams, list)
+
+        assert isinstance(mkv_video_data.raw_stream, dict)
+
+        for audio_stream in mkv_video_data.audio_streams:
+            assert bool(audio_stream) is True
+            assert isinstance(audio_stream, dict)
+        assert isinstance(mkv_video_data.ss_time(), int)
