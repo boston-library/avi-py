@@ -92,6 +92,34 @@ class TestAviFFMpegProcessor:
             assert mp4_jpg.format =='JPEG'
             assert mp4_jpg.width == 300
 
+    def test_mkv_thumbnail_generation(self, thumbnail_dest_file):
+        mkv_ffmpeg_thumbnail = AviFFMpegProcessor.process_thumbnail(file_fixtures.MKV_VIDEO, thumbnail_dest_file)
+
+        assert isinstance(mkv_ffmpeg_thumbnail, AviFFMpegProcessor)
+        assert isinstance(mkv_ffmpeg_thumbnail.success, bool)
+        assert isinstance(mkv_ffmpeg_thumbnail.result_message, str)
+        assert isinstance(mkv_ffmpeg_thumbnail.dest_file_path, str)
+        assert isinstance(mkv_ffmpeg_thumbnail.result, dict)
+        assert isinstance(mkv_ffmpeg_thumbnail.json_result(), str)
+        assert isinstance(mkv_ffmpeg_thumbnail.video_data, AviVideoData)
+
+        assert mkv_ffmpeg_thumbnail.audio_data is None
+        assert mkv_ffmpeg_thumbnail.dest_file_path == thumbnail_dest_file
+        assert mkv_ffmpeg_thumbnail.success is True
+        assert mkv_ffmpeg_thumbnail.result_message == f'Successfully created ffmpeg derivative at {thumbnail_dest_file}'
+
+        assert bool(mkv_ffmpeg_thumbnail.result) is True
+        assert all(key in mkv_ffmpeg_thumbnail.result for key in ['success', 'message'])
+
+        assert mkv_ffmpeg_thumbnail.success == mkv_ffmpeg_thumbnail.result.get('success')
+        assert mkv_ffmpeg_thumbnail.result_message == mkv_ffmpeg_thumbnail.result.get('message')
+
+        assert mkv_ffmpeg_thumbnail.json_result() == json.dumps(mkv_ffmpeg_thumbnail.result)
+
+        with file_fixtures.image_fixture(thumbnail_dest_file) as mkv_jpg:
+            assert mkv_jpg.format == 'JPEG'
+            assert mkv_jpg.width == 300
+
     def test_wav_mp3_generation(self, mp3_destination_file):
         wav_ffmpeg_mp3 = AviFFMpegProcessor.process_mp3(file_fixtures.WAV_AUDIO, mp3_destination_file)
 
