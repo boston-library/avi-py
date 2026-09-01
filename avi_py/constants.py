@@ -11,7 +11,7 @@ COLOR_MODES=['RGB', 'RGBA']
 VALID_IMAGE_EXTENSIONS=['.tiff', '.tif']
 VALID_VIDEO_EXTENSIONS=['.mov', '.mp4', '.avi', '.mkv']
 VALID_AUDIO_EXTENSIONS=['.wav']
-MAX_CONCURRENCY=min(32, os.cpu_count() + 4)
+KDU_MAX_CONCURRENCY=min(8, os.cpu_count() or 1)
 KDU_DEFAULT_LAYER_COUNT=8
 KDU_DEFAULT_TILE_SIZE=1024
 IMAGE_DEFAULT_COMPRESSION=10
@@ -24,7 +24,7 @@ FFMPEG_THUMBNAIL_SIZE=(300, 300)
 FFMPEG_AUDIO_ARGS={'ar': '44100', 'ac': 2, 'audio_bitrate': '192k', 'acodec': 'libmp3lame', 'f': 'mp3'}
 
 KAKADU_DEFAULT_OPTIONS=[
-    '-num_threads', str(os.cpu_count()),
+    '-num_threads', str(KDU_MAX_CONCURRENCY),
     '-double_buffering', '10',
     '-flush_period', '1024',
     '-no_weights'
@@ -53,7 +53,7 @@ KAKADU_DEFAULT_RECIPE=[
     'ORGtparts=R',
 ]
 
-TESS_MAX_PROCESSES=min(2, os.cpu_count())
+TESS_MAX_PROCESSES=min(2, os.cpu_count() or 1)
 TESS_DEFAULT_LANG=r'osd+eng'
 TESS_DEFAULT_CFG=r'--oem 1 --psm 1 --dpi 300'
 TESS_OUT_FILE_TYPES={'pdf': 'pdf', 'alto': 'xml'}
