@@ -3,7 +3,7 @@ name: Build branches
 on: [push, pull_request]
 
 env:
-  PYTHON: "3.10.20"
+  PYTHON: "3.11.18"
   KAKADU_HOME: /opt/kakadu
   AVI_DEBUG: "true"
   MAGICK_MEMORY_LIMIT: "512"
@@ -17,10 +17,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.11"
           # cache: pip
 
       - name: Install dependencies
